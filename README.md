@@ -8,7 +8,7 @@ WBF is an enterprise-grade architecture framework for building business applicat
 
 - **Align code with business structure** — Organize applications into business domains using modules
 - **Model business concepts** — Define entities, operations, and rules as first-class framework objects
-- **Enforce business logic** — Apply business validations consistently across operations and processes
+- **Define business rules** — Model and register business validations consistently across operations and processes
 - **Orchestrate operations** — Coordinate multi-step business processes using workflows
 - **Automate workflows** — Execute defined business processes with lifecycle management and event handling
 
@@ -35,7 +35,7 @@ This Laravel package provides:
 - **CLI commands** — Commands for managing, verifying, and generating business framework artifacts
 - **Registry system** — Central registries for workflows, business functions, validations, modules, and entities
 - **Workflow engine** — Execute defined business workflows with lifecycle management and state tracking
-- **Validation framework** — Declarative validation engine with rules evaluation and issue reporting
+- **Validation framework** — Declarative validation definitions, registration, and validation issue structures for application-level rule evaluation
 - **Lifecycle management** — Hooks for before/after execution, custom logic injection, and error handling
 - **UUID support** — Built-in UUID generation for all entities
 
@@ -45,6 +45,8 @@ This Laravel package provides:
 - **Laravel:** ^13.0
 
 ## Installation
+
+Install the package through Composer:
 
 ```bash
 composer require waysnx/business-framework
@@ -118,14 +120,14 @@ Module (Container Layer)
 └── Workflows (Orchestration Layer)  — Multi-step processes
 ```
 
-Entities are operated on by business functions. Validations protect both entities and business functions. Workflows orchestrate business functions, evaluate validations at steps, and manage entity state throughout execution.
+Entities are operated on by business functions. Validation definitions provide business rules that applications can evaluate against entities and operations. Workflows orchestrate business functions and manage entity state throughout execution. Registered validation definitions can be used by applications to evaluate business rules at appropriate points.
 
 For example, in an Employee Onboarding workflow:
 - **Module:** HumanResources
 - **Entities:** Employee, Manager, Department
 - **Business Functions:** CreateEmployee, AssignDepartment, SendWelcome
 - **Validations:** ManagerMustExist, EmailMustBeValid, DepartmentMustHaveCapacity
-- **Workflow:** OnboardingProcess (orchestrates functions → evaluates validations → manages employee state)
+- **Workflow:** OnboardingProcess (orchestrates functions → applications can evaluate registered validations at appropriate points → manages employee state)
 
 ## Illustrative Example
 
@@ -145,7 +147,7 @@ Consider an audit management system (this is an illustrative example of how WBF 
 
 **Workflow:** AuditReview
 - Orchestrates the complete audit process: CreateAudit → StartAudit → ConductAudit → ReviewFindings → ResolveFindings → CloseAudit
-- Evaluates validations at each step
+- Uses registered validation definitions at appropriate points in the audit process
 - Manages audit state through transitions
 
 > **Note:** This is an illustrative example showing how WBF concepts work together. It is not a claim that WaysNX Business Framework contains audit-specific functionality. Developers implement their own domain-specific modules and entities.
@@ -252,6 +254,145 @@ php artisan wbf:register workflow OnboardingWorkflow --fail-if-not-found  # Exit
 php artisan wbf:register workflow OnboardingWorkflow --json               # Output as JSON
 ```
 
+### wbf:createdemo — End-to-End WBF Demonstration
+
+Run a complete working demonstration of WBF concepts in action using a Hospital Audit Management domain.
+
+```bash
+php artisan wbf:createdemo               # Run demo with human-readable output
+php artisan wbf:createdemo --json        # Run demo with machine-readable JSON output
+```
+
+The CREATEDemo command demonstrates:
+
+- **Business-first modeling** — All artifacts defined in business terms
+- **Module definition** — Organizing audit-related capabilities
+- **Entity definition** — Hospital audit record structure
+- **Business Function definitions** — Validate Audit, Record Finding, Complete Audit
+- **Validation definition and registration** — Business rules for audit domain (definitions registered for validation framework)
+- **Workflow definition** — Multi-step orchestration with defined steps
+- **Registry registration and discovery** — All artifacts registered and discoverable by ID
+- **Sequential workflow orchestration** — Steps executed in sequence by WorkflowEngine
+- **WorkflowEngine execution** — Complete workflow runs with lifecycle event dispatch
+- **WorkflowResult tracking** — Execution outcomes captured with complete tracking
+- **Lifecycle management participation** — Events dispatched before/after workflow and steps
+- **Framework-neutral architecture** — Pure business concepts independent of HTTP/ORM
+
+#### Demo Flow
+
+```
+Hospital Audit Management (Module)
+         ↓
+    Audit (Entity)
+         ↓
+   Business Functions
+    ├─ Validate Audit
+    ├─ Record Finding
+    └─ Complete Audit
+         ↓
+  Validation Definition
+    ├─ Audit Data Validation
+    ├─ Registered in ValidationRegistry
+    └─ Available for evaluation
+         ↓
+   Audit Review (Workflow)
+    ├─ validate-step
+    ├─ record-step
+    └─ complete-step
+         ↓
+    WorkflowEngine
+    ├─ Execute steps in sequence
+    ├─ Dispatch lifecycle events
+    └─ Collect outcomes
+         ↓
+   WorkflowResult
+    ├─ Execution Status
+    ├─ Completed Steps
+    ├─ Duration
+    └─ Metadata
+```
+
+#### Why CREATEDemo Exists
+
+CREATEDemo provides:
+
+- **First-run verification** — Confirm WBF is properly installed and all components work together
+- **Concrete WBF example** — See how all five concepts (Module, Entity, Business Function, Validation, Workflow) work together
+- **Reference implementation** — Study how to structure your own domain modules and workflows
+- **Simple demonstration** — Understand WBF concepts without requiring a large application
+
+CREATEDemo is **not** a production business application. It is an educational demonstration designed to:
+- Verify framework installation
+- Illustrate WBF architecture
+- Serve as a reference for your own implementations
+
+#### Example Output
+
+Human-readable output:
+```
+╔════════════════════════════════════════════════════════════════╗
+║  WaysNX Business Framework - Complete Demonstration            ║
+║  Hospital Audit Management Example                            ║
+╚════════════════════════════════════════════════════════════════╝
+
+📋 PHASE 1: DEFINING WBF ARTIFACTS
+═══════════════════════════════════
+
+✓ Module: "Hospital Audit Management"
+✓ Entity: "Audit"
+✓ Business Function: "Validate Audit"
+✓ Business Function: "Record Finding"
+✓ Business Function: "Complete Audit"
+✓ Validation: "Audit Data Validation"
+✓ Workflow: "Audit Review" (3 steps)
+
+[... continues with registration, discovery, and execution ...]
+
+✨ WBF DEMONSTRATION SUMMARY
+═════════════════════════════
+
+✓ Module: Hospital Audit Management
+✓ Entity: Audit record
+✓ Business Functions: 3 (Validate, Record, Complete)
+✓ Validations: Business rules defined and registered
+✓ Workflow: Multi-step orchestration
+✓ Execution: Successful completion
+✓ Lifecycle: Event dispatch
+✓ Result: Immutable outcome tracking
+```
+
+Machine-readable output (with `--json`):
+
+The following is illustrative output; execution IDs, durations, and other runtime values vary between runs.
+
+```json
+{
+  "success": true,
+  "demo": {
+    "name": "Hospital Audit Management",
+    "domain": "Audit"
+  },
+  "artifacts": {
+    "module": {
+      "id": "AUDIT",
+      "displayName": "Hospital Audit Management"
+    },
+    "entities": [...],
+    "businessFunctions": [...],
+    "validations": [...],
+    "workflow": {...}
+  },
+  "execution": {
+    "executionId": "exec-1234567890",
+    "status": "completed",
+    "completedSteps": [...],
+    "duration": 45
+  }
+}
+```
+
+The JSON output is suitable for automation, tooling, and AI-oriented inspection of WBF behavior.
+
 ## Generated Artifacts
 
 When you run `wbf:make`, the command generates scaffolded code for the specified artifact type. Output paths and namespaces are configurable via command options but default to Laravel application structure.
@@ -344,7 +485,7 @@ $workflowRegistry->register(OnboardingDefinition::create());
 ```
 
 4. **Discovery:** Once registered, the registry provides lookup methods (`findById()`, `findByName()`, `findByModule()`, etc.)
-5. **Execution:** The WorkflowEngine and ValidationFramework use registries to find and execute artifacts
+5. **Execution:** The WorkflowEngine uses registered workflow definitions for execution, while applications can use the ValidationRegistry to discover registered validation definitions.
 
 Use `wbf:list` to view all currently registered resources in a running application.
 
@@ -415,13 +556,41 @@ Subclass WorkflowEngine to customize behavior:
 
 ## Validation Framework
 
-The **ValidationFramework** executes validation rules:
+The **ValidationFramework** provides the structures and registration mechanisms used to define and manage validation rules. Applications are responsible for evaluating registered validation definitions.
 
 1. **Rule Evaluation** — Rules are evaluated against entities or operations
 2. **Issue Reporting** — Violations produce validation issues
 3. **Severity Classification** — Issues are classified as errors or warnings
 4. **Scope Application** — Validations apply to specific entity types or operation scopes
 5. **Declarative Specification** — Validation rules are defined separate from business logic
+
+**Current implementation:** The framework provides definition and registration of validations. Validation execution remains an application responsibility. Developers can query the ValidationRegistry to retrieve registered validation definitions and implement evaluation logic appropriate to their domain.
+
+## Current Implementation Scope
+
+The WaysNX Business Framework Laravel package focuses on:
+
+- ✓ Business-first architecture and modeling patterns
+- ✓ Foundation concepts (Module, Entity, Business Function, Validation, Workflow)
+- ✓ Registry-based artifact discovery and lookup
+- ✓ Sequential workflow orchestration and execution
+- ✓ Lifecycle management and event dispatch
+- ✓ Developer experience (CLI, code generation, auto-discovery)
+- ✓ Framework-neutral business concepts
+- ✓ Inspectable metadata for tooling and automation
+
+Not currently included (planned for future phases):
+
+- Workflow persistence and resumption
+- Retry and compensation logic
+- Parallel workflow execution
+- Workflow scheduling and delayed execution
+- Human task workflows and approvals
+- Data quality protocol (DQP)
+- WBF Studio (graphical modeling tool)
+- Advanced enterprise features
+
+This reflects Phase 1-4 implementation scope. The framework provides a solid foundation for business-first architecture. Advanced capabilities will be added as the framework evolves.
 
 ## Laravel Integration
 
@@ -495,10 +664,12 @@ This means:
 
 WBF is designed so its core business concepts can be implemented across different technology stacks. The fundamental concepts (Module, Entity, Business Function, Validation, Workflow) are technology-agnostic.
 
-- **Laravel** — This package (PHP/Laravel)
-- **Other platforms** — WBF can be implemented in other frameworks and languages. Future implementations may be provided as the framework evolves
+Currently verified implementations:
 
-The business concepts remain consistent; implementation details adapt to each platform's conventions and capabilities.
+- **Laravel** — This package (PHP 8.3+, Laravel 13+)
+- **Node.js / TypeScript** — Available at [github.com/waysnx/business-framework-node](https://github.com/waysnx/business-framework-node)
+
+Other technology implementations may be provided as the framework evolves. The business concepts remain consistent across platforms; implementation details adapt to each platform's conventions and capabilities.
 
 ## For AI Agents and Automation
 
@@ -513,10 +684,15 @@ WBF clearly separates metadata from execution:
   - Registered in discoverable registries
   - Suitable for inspection and analysis
   
-- **Runtime/Execution classes** (behavior): `WorkflowEngine`, `ValidationFramework`, `BusinessFunctionRuntime`
-  - Execute definitions
-  - Manage state and lifecycle
+- **Runtime/Execution classes** (behavior): `WorkflowEngine`, `BusinessFunctionRuntime`
+  - Execute business process definitions
+  - Manage execution state and lifecycle
   - Invoke business logic
+
+- **Validation infrastructure:** `ValidationFramework`
+  - Provides validation structures and registration mechanisms
+  - Applications evaluate registered validation definitions
+  - Organizes validation issues and results where applicable
 
 This separation enables:
 - Schema extraction and analysis
@@ -572,7 +748,7 @@ The WBF Laravel package structure:
 ├── config/
 │   └── business-framework.php # Package configuration
 ├── tests/
-│   └── ...                    # Test suite (817 tests)
+│   └── ...                    # Test suite
 ├── composer.json              # Package metadata
 ├── composer.lock              # Dependency lock file
 ├── phpunit.xml                # Test configuration
