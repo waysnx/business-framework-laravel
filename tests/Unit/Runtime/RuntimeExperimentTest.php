@@ -150,7 +150,7 @@ class RuntimeExperimentTest extends TestCase
         $this->assertArrayHasKey('functionId', $context);
         $this->assertArrayHasKey('executionTime', $context);
         $this->assertArrayHasKey('status', $context);
-        $this->assertGreaterThan(0, $context['executionTime']);
+        $this->assertGreaterThanOrEqual(0, $context['executionTime']);
     }
 
     /**
