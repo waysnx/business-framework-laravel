@@ -263,6 +263,7 @@ class LaravelServiceProvider extends ServiceProvider
             \WaysNX\BusinessFramework\Console\Commands\ShowCommand::class,
             \WaysNX\BusinessFramework\Console\Commands\RegisterCommand::class,
             \WaysNX\BusinessFramework\Console\Commands\DoctorCommand::class,
+            \WaysNX\BusinessFramework\Console\Commands\CreateDemoCommand::class,
         ]);
     }
 }

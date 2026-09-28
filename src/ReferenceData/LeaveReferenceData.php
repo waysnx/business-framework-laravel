@@ -199,35 +199,62 @@ class LeaveReferenceData
      * Existing approved leave requests
      *
      * In production: SELECT * FROM leave_requests WHERE status = 'Approved' AND employee_id = ?
+     * 
+     * NOTE: Approved leave dates are calculated relative to today to ensure tests
+     * work regardless of when they run. We set them 90-94 days in the future to avoid
+     * conflicts with regular test dates.
      */
-    private static array $approvedLeave = [
-        'EMP-2026-001' => [
-            [
-                'id' => 'LR-2026-APPROVED-001',
-                'employee_id' => 'EMP-2026-001',
-                'leave_type' => 'Annual',
-                'start_date' => '2026-09-01',
-                'end_date' => '2026-09-05',
-                'status' => 'Approved',
-                'created_at' => '2026-08-01T10:00:00Z',
+    public static function getApprovedLeave(): array
+    {
+        // Calculate relative dates (ensure they're always far in the future)
+        $startDate1 = (new \DateTime())
+            ->add(new \DateInterval('P90D'))
+            ->format('Y-m-d');
+        $endDate1 = (new \DateTime())
+            ->add(new \DateInterval('P94D'))
+            ->format('Y-m-d');
+        
+        $startDate2 = (new \DateTime())
+            ->add(new \DateInterval('P100D'))
+            ->format('Y-m-d');
+        $endDate2 = (new \DateTime())
+            ->add(new \DateInterval('P102D'))
+            ->format('Y-m-d');
+
+        return [
+            'EMP-2026-001' => [
+                [
+                    'id' => 'LR-2026-APPROVED-001',
+                    'employee_id' => 'EMP-2026-001',
+                    'leave_type' => 'Annual',
+                    'start_date' => $startDate1,
+                    'end_date' => $endDate1,
+                    'status' => 'Approved',
+                    'created_at' => (new \DateTime())->sub(new \DateInterval('P30D'))->format('Y-m-d\TH:i:s\Z'),
+                ],
             ],
-        ],
-        'EMP-2026-002' => [
-            [
-                'id' => 'LR-2026-APPROVED-002',
-                'employee_id' => 'EMP-2026-002',
-                'leave_type' => 'Sick',
-                'start_date' => '2026-09-10',
-                'end_date' => '2026-09-12',
-                'status' => 'Approved',
-                'created_at' => '2026-08-15T14:30:00Z',
+            'EMP-2026-002' => [
+                [
+                    'id' => 'LR-2026-APPROVED-002',
+                    'employee_id' => 'EMP-2026-002',
+                    'leave_type' => 'Sick',
+                    'start_date' => $startDate2,
+                    'end_date' => $endDate2,
+                    'status' => 'Approved',
+                    'created_at' => (new \DateTime())->sub(new \DateInterval('P15D'))->format('Y-m-d\TH:i:s\Z'),
+                ],
             ],
-        ],
-        'EMP-2026-003' => [],
-        'EMP-2026-004' => [],
-        'EMP-2026-005' => [],
-        'EMP-2026-006' => [],
-    ];
+            'EMP-2026-003' => [],
+            'EMP-2026-004' => [],
+            'EMP-2026-005' => [],
+            'EMP-2026-006' => [],
+        ];
+    }
+
+    /**
+     * Static property that holds the approved leave (cached)
+     */
+    private static ?array $approvedLeave = null;
 
     /**
      * Approval rules by leave type
@@ -357,6 +384,11 @@ class LeaveReferenceData
         string $startDate,
         string $endDate
     ): array {
+        // Get approved leave (dynamically calculated relative to today)
+        if (self::$approvedLeave === null) {
+            self::$approvedLeave = self::getApprovedLeave();
+        }
+        
         $employeeLeave = self::$approvedLeave[$employeeId] ?? [];
         $overlapping = [];
 

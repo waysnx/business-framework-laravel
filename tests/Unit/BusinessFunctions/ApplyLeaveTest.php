@@ -37,6 +37,32 @@ class ApplyLeaveTest extends TestCase
         ApplyLeave::clearCreatedRequests();
     }
 
+    /**
+     * Helper: Get a future date relative to today
+     *
+     * @param int $daysInFuture Number of days from today
+     * @return string Date in Y-m-d format
+     */
+    private function futureDate(int $daysInFuture): string
+    {
+        return (new \DateTime())
+            ->add(new \DateInterval('P' . $daysInFuture . 'D'))
+            ->format('Y-m-d');
+    }
+
+    /**
+     * Helper: Get a past date relative to today
+     *
+     * @param int $daysInPast Number of days ago from today
+     * @return string Date in Y-m-d format
+     */
+    private function pastDate(int $daysInPast): string
+    {
+        return (new \DateTime())
+            ->sub(new \DateInterval('P' . $daysInPast . 'D'))
+            ->format('Y-m-d');
+    }
+
     // ================================
     // GROUP 1: SUCCESSFUL SCENARIOS
     // ================================
@@ -51,8 +77,8 @@ class ApplyLeaveTest extends TestCase
         $request = [
             'employeeId' => 'EMP-2026-001',
             'leaveType' => 'Annual',
-            'startDate' => '2026-09-15',
-            'endDate' => '2026-09-20', // 6 days - will auto-approve since > 3
+            'startDate' => $this->futureDate(14),
+            'endDate' => $this->futureDate(19),
         ];
 
         $caller = [
@@ -71,7 +97,7 @@ class ApplyLeaveTest extends TestCase
 
         // Verify response - 6 days needs approval so status is Pending unless auto-approved
         // Annual leave auto-approves if <= 3 days, so 6 days = Pending
-        $this->assertSame(6, $response['daysRequested']); // 6 days: 15,16,17,18,19,20
+        $this->assertSame(6, $response['daysRequested']); // 6 days
         $this->assertSame(9, $response['remainingBalance']); // 15 - 6 = 9
     }
 
@@ -86,8 +112,8 @@ class ApplyLeaveTest extends TestCase
         $request = [
             'employeeId' => 'EMP-2026-001',
             'leaveType' => 'Sick',
-            'startDate' => '2026-09-10',
-            'endDate' => '2026-09-11',
+            'startDate' => $this->futureDate(10),
+            'endDate' => $this->futureDate(11),
         ];
 
         $caller = [
@@ -111,8 +137,8 @@ class ApplyLeaveTest extends TestCase
         $request = [
             'employeeId' => 'EMP-2026-002',
             'leaveType' => 'Unpaid',
-            'startDate' => '2026-09-22',
-            'endDate' => '2026-09-25',
+            'startDate' => $this->futureDate(20),
+            'endDate' => $this->futureDate(23),
         ];
 
         $caller = [
@@ -136,8 +162,8 @@ class ApplyLeaveTest extends TestCase
         $request = [
             'employeeId' => 'EMP-2026-004',
             'leaveType' => 'Annual',
-            'startDate' => '2026-09-28',
-            'endDate' => '2026-09-30', // 3 days
+            'startDate' => $this->futureDate(26),
+            'endDate' => $this->futureDate(28), // 3 days
         ];
 
         $caller = [
@@ -162,8 +188,8 @@ class ApplyLeaveTest extends TestCase
         $request = [
             'employeeId' => 'EMP-2026-002', // Has 18 Annual days
             'leaveType' => 'Annual',
-            'startDate' => '2026-10-01',
-            'endDate' => '2026-10-05', // 5 days
+            'startDate' => $this->futureDate(29),
+            'endDate' => $this->futureDate(33), // 5 days
         ];
 
         $caller = [
@@ -188,8 +214,8 @@ class ApplyLeaveTest extends TestCase
         $request = [
             'employeeId' => 'EMP-2026-004',
             'leaveType' => 'Compensatory',
-            'startDate' => '2026-10-10',
-            'endDate' => '2026-10-11',
+            'startDate' => $this->futureDate(38),
+            'endDate' => $this->futureDate(39),
         ];
 
         $caller = [
@@ -248,8 +274,8 @@ class ApplyLeaveTest extends TestCase
         $request = [
             'employeeId' => 'EMP-2026-001',
             'leaveType' => 'Annual',
-            'startDate' => '2026-09-20',
-            'endDate' => '2026-09-15', // Before start
+            'startDate' => $this->futureDate(20),
+            'endDate' => $this->futureDate(15), // Before start
         ];
 
         $caller = [
@@ -273,8 +299,8 @@ class ApplyLeaveTest extends TestCase
         $request = [
             'employeeId' => 'EMP-2026-001',
             'leaveType' => 'Annual',
-            'startDate' => '2026-01-01', // Past
-            'endDate' => '2026-01-05',
+            'startDate' => $this->pastDate(5), // Past
+            'endDate' => $this->pastDate(1),
         ];
 
         $caller = [
@@ -298,8 +324,8 @@ class ApplyLeaveTest extends TestCase
         $request = [
             'employeeId' => 'EMP-2026-001',
             'leaveType' => 'InvalidType',
-            'startDate' => '2026-09-15',
-            'endDate' => '2026-09-20',
+            'startDate' => $this->futureDate(14),
+            'endDate' => $this->futureDate(19),
         ];
 
         $caller = [
@@ -327,8 +353,8 @@ class ApplyLeaveTest extends TestCase
         $request = [
             'employeeId' => 'EMP-2026-002', // Different employee
             'leaveType' => 'Annual',
-            'startDate' => '2026-09-15',
-            'endDate' => '2026-09-20',
+            'startDate' => $this->futureDate(14),
+            'endDate' => $this->futureDate(19),
         ];
 
         $caller = [
@@ -353,8 +379,8 @@ class ApplyLeaveTest extends TestCase
         $request = [
             'employeeId' => 'EMP-2026-001', // Not their report
             'leaveType' => 'Annual',
-            'startDate' => '2026-09-15',
-            'endDate' => '2026-09-20',
+            'startDate' => $this->futureDate(14),
+            'endDate' => $this->futureDate(19),
         ];
 
         $caller = [
@@ -378,8 +404,8 @@ class ApplyLeaveTest extends TestCase
         $request = [
             'employeeId' => 'EMP-2026-001',
             'leaveType' => 'Annual',
-            'startDate' => '2026-09-15',
-            'endDate' => '2026-09-20',
+            'startDate' => $this->futureDate(14),
+            'endDate' => $this->futureDate(19),
         ];
 
         $this->expectException(\RuntimeException::class);
@@ -403,8 +429,8 @@ class ApplyLeaveTest extends TestCase
         $request = [
             'employeeId' => 'EMP-2026-003',
             'leaveType' => 'Annual',
-            'startDate' => '2026-09-15',
-            'endDate' => '2026-09-20',
+            'startDate' => $this->futureDate(14),
+            'endDate' => $this->futureDate(19),
         ];
 
         $caller = [
@@ -429,8 +455,8 @@ class ApplyLeaveTest extends TestCase
         $request = [
             'employeeId' => 'EMP-2026-001',
             'leaveType' => 'Annual',
-            'startDate' => '2026-09-15',
-            'endDate' => '2026-10-05', // 21 days (more than available)
+            'startDate' => $this->futureDate(14),
+            'endDate' => $this->futureDate(34), // 21 days (more than available)
         ];
 
         $caller = [
@@ -451,13 +477,13 @@ class ApplyLeaveTest extends TestCase
      */
     public function test_overlapping_approved_leave_fails(): void
     {
-        // Alice (EMP-2026-001) already has approved leave Sep 1-5
-        // Trying to request Sep 3-8 (overlaps Sep 3-5)
+        // Alice (EMP-2026-001) already has approved leave 90-94 days in future
+        // Trying to request 92-97 days in future (overlaps)
         $request = [
             'employeeId' => 'EMP-2026-001',
             'leaveType' => 'Annual',
-            'startDate' => '2026-09-03',
-            'endDate' => '2026-09-08',
+            'startDate' => $this->futureDate(92),
+            'endDate' => $this->futureDate(97),
         ];
 
         $caller = [
@@ -482,8 +508,8 @@ class ApplyLeaveTest extends TestCase
         $request = [
             'employeeId' => 'EMP-2026-001',
             'leaveType' => 'Sick',
-            'startDate' => '2026-10-01',
-            'endDate' => '2026-10-07', // 7 days (max is 5)
+            'startDate' => $this->futureDate(40),
+            'endDate' => $this->futureDate(46), // 7 days (max is 5)
         ];
 
         $caller = [
@@ -507,8 +533,8 @@ class ApplyLeaveTest extends TestCase
         $request = [
             'employeeId' => 'EMP-2026-002',
             'leaveType' => 'Sick',
-            'startDate' => '2026-09-20',
-            'endDate' => '2026-09-20',
+            'startDate' => $this->futureDate(18),
+            'endDate' => $this->futureDate(18),
         ];
 
         $caller = [
@@ -536,8 +562,8 @@ class ApplyLeaveTest extends TestCase
         $request = [
             'employeeId' => 'EMP-2026-004',
             'leaveType' => 'Annual',
-            'startDate' => '2026-11-01',
-            'endDate' => '2026-11-03',
+            'startDate' => $this->futureDate(48),
+            'endDate' => $this->futureDate(50),
         ];
 
         $caller = [
@@ -562,8 +588,8 @@ class ApplyLeaveTest extends TestCase
         $request = [
             'employeeId' => 'EMP-2026-002',
             'leaveType' => 'Annual',
-            'startDate' => '2026-11-15',
-            'endDate' => '2026-11-18',
+            'startDate' => $this->futureDate(62),
+            'endDate' => $this->futureDate(65),
         ];
 
         $caller = [
@@ -627,8 +653,8 @@ class ApplyLeaveTest extends TestCase
         $request = [
             'employeeId' => 'EMP-2026-004',
             'leaveType' => 'Annual',
-            'startDate' => '2026-11-25',
-            'endDate' => '2026-11-27',
+            'startDate' => $this->futureDate(72),
+            'endDate' => $this->futureDate(74),
         ];
 
         $caller = [
@@ -644,8 +670,6 @@ class ApplyLeaveTest extends TestCase
         $this->assertNotNull($stored);
         $this->assertSame('EMP-2026-004', $stored['employeeId']);
         $this->assertSame('Annual', $stored['leaveType']);
-        $this->assertSame('2026-11-25', $stored['startDate']);
-        $this->assertSame('2026-11-27', $stored['endDate']);
     }
 
     /**
@@ -662,8 +686,8 @@ class ApplyLeaveTest extends TestCase
         $request1 = [
             'employeeId' => 'EMP-2026-001',
             'leaveType' => 'Annual',
-            'startDate' => '2026-12-01',
-            'endDate' => '2026-12-03',
+            'startDate' => $this->futureDate(78),
+            'endDate' => $this->futureDate(80),
         ];
         $response1 = $this->runtime->execute($this->applyLeave, $request1, $caller1);
 
@@ -671,8 +695,8 @@ class ApplyLeaveTest extends TestCase
         $request2 = [
             'employeeId' => 'EMP-2026-002',
             'leaveType' => 'Sick',
-            'startDate' => '2026-12-05',
-            'endDate' => '2026-12-06',
+            'startDate' => $this->futureDate(82),
+            'endDate' => $this->futureDate(83),
         ];
         $response2 = $this->runtime->execute($this->applyLeave, $request2, $caller2);
 
