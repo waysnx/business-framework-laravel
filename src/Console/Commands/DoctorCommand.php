@@ -231,28 +231,28 @@ class DoctorCommand extends BaseWbfCommand
         try {
             $providerClass = 'WaysNX\\BusinessFramework\\ServiceProvider\\LaravelServiceProvider';
             $container = app();
-            
+
             // Check if we're in a real Laravel application or lightweight test context
             $isLightweightTestContext = method_exists($container, 'runningUnitTests') && $container->runningUnitTests();
-            
+
             if ($isLightweightTestContext) {
                 // In lightweight test context: check config only, report as "lightweight context"
                 $providers = config('app.providers', []);
                 $found = in_array($providerClass, $providers, true);
-                
+
                 $this->checks['service_provider'] = [
                     'name' => 'Service Provider',
                     'ok' => $found,
                     'value' => $found ? 'Config (lightweight)' : 'Not Found',
-                    'message' => $found 
-                        ? 'OK (in config; registration not verifiable in lightweight test context)' 
+                    'message' => $found
+                        ? 'OK (in config; registration not verifiable in lightweight test context)'
                         : "FAILED: Provider not in config. Add to app.providers or use package auto-discovery",
                 ];
             } else {
                 // In real Laravel application: check actual provider registration
                 $providers = config('app.providers', []);
                 $inConfig = in_array($providerClass, $providers, true);
-                
+
                 // Check if provider was actually loaded by Laravel
                 $loadedProviders = [];
                 if (method_exists($container, 'getLoadedProviders')) {
@@ -262,7 +262,7 @@ class DoctorCommand extends BaseWbfCommand
                     // Fallback: just check if provider is in config
                     $isLoaded = $inConfig;
                 }
-                
+
                 $this->checks['service_provider'] = [
                     'name' => 'Service Provider',
                     'ok' => $isLoaded,
@@ -376,6 +376,4 @@ class DoctorCommand extends BaseWbfCommand
             return self::EXIT_SYSTEM_FAILURE;
         }
     }
-
-
 }

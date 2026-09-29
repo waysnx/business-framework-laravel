@@ -69,7 +69,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-creation
      */
-    public function test_can_create_valid_capability(): void
+    public function testCanCreateValidCapability(): void
     {
         $capability = $this->createValidCapability();
 
@@ -82,7 +82,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-creation
      */
-    public function test_creation_initializes_base_model_fields(): void
+    public function testCreationInitializesBaseModelFields(): void
     {
         $capability = $this->createValidCapability();
 
@@ -100,7 +100,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-identity
      */
-    public function test_capability_id_getter_setter(): void
+    public function testCapabilityIdGetterSetter(): void
     {
         $capability = $this->createValidCapability();
 
@@ -111,7 +111,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-identity
      */
-    public function test_capability_id_cannot_be_empty(): void
+    public function testCapabilityIdCannotBeEmpty(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Capability ID cannot be empty');
@@ -124,7 +124,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-identity
      */
-    public function test_capability_name_getter_setter(): void
+    public function testCapabilityNameGetterSetter(): void
     {
         $capability = $this->createValidCapability();
 
@@ -135,7 +135,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-identity
      */
-    public function test_capability_name_cannot_be_empty(): void
+    public function testCapabilityNameCannotBeEmpty(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Capability name cannot be empty');
@@ -148,7 +148,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-identity
      */
-    public function test_description_getter_setter(): void
+    public function testDescriptionGetterSetter(): void
     {
         $capability = $this->createValidCapability();
         $capability->setDescription('Search and filter employee records');
@@ -160,7 +160,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-identity
      */
-    public function test_description_can_be_empty(): void
+    public function testDescriptionCanBeEmpty(): void
     {
         $capability = $this->createValidCapability();
         $capability->setDescription('');
@@ -176,7 +176,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-domain
      */
-    public function test_domain_id_getter_setter(): void
+    public function testDomainIdGetterSetter(): void
     {
         $capability = $this->createValidCapability();
 
@@ -187,7 +187,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-domain
      */
-    public function test_domain_id_cannot_be_empty(): void
+    public function testDomainIdCannotBeEmpty(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Domain ID cannot be empty');
@@ -200,7 +200,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-domain
      */
-    public function test_domain_id_can_be_integer(): void
+    public function testDomainIdCanBeInteger(): void
     {
         $capability = $this->createValidCapability();
         $capability->setDomainId(123);
@@ -216,7 +216,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-owner
      */
-    public function test_business_owner_getter_setter(): void
+    public function testBusinessOwnerGetterSetter(): void
     {
         $capability = $this->createValidCapability();
 
@@ -227,7 +227,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-owner
      */
-    public function test_business_owner_cannot_be_empty(): void
+    public function testBusinessOwnerCannotBeEmpty(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Business owner cannot be empty');
@@ -240,7 +240,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-owner
      */
-    public function test_business_owner_can_be_integer(): void
+    public function testBusinessOwnerCanBeInteger(): void
     {
         $capability = $this->createValidCapability();
         $capability->setBusinessOwner(123);
@@ -256,7 +256,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-lifecycle
      */
-    public function test_all_valid_lifecycle_states(): void
+    public function testAllValidLifecycleStates(): void
     {
         $states = [
             BusinessCapability::IDENTIFY,
@@ -281,7 +281,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-lifecycle
      */
-    public function test_invalid_status_raises_exception(): void
+    public function testInvalidStatusRaisesException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid capability status');
@@ -294,7 +294,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-lifecycle
      */
-    public function test_default_status_is_identify(): void
+    public function testDefaultStatusIsIdentify(): void
     {
         $capability = new BusinessCapability();
         $this->assertEquals(BusinessCapability::IDENTIFY, $capability->getStatus());
@@ -308,7 +308,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-outcome
      */
-    public function test_business_outcome_getter_setter(): void
+    public function testBusinessOutcomeGetterSetter(): void
     {
         $capability = $this->createValidCapability();
 
@@ -319,7 +319,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-outcome
      */
-    public function test_business_outcome_cannot_be_empty(): void
+    public function testBusinessOutcomeCannotBeEmpty(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Business outcome cannot be empty');
@@ -332,7 +332,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-outcome
      */
-    public function test_business_outcome_metadata_preserved(): void
+    public function testBusinessOutcomeMetadataPreserved(): void
     {
         $capability = $this->createValidCapability();
         $outcome = 'Enable rapid employee search across organization';
@@ -349,7 +349,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-workflows
      */
-    public function test_add_workflow_with_valid_structure(): void
+    public function testAddWorkflowWithValidStructure(): void
     {
         $capability = $this->createValidCapability();
         $workflow = ['id' => 'wf-search', 'name' => 'Search Workflow'];
@@ -363,7 +363,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-workflows
      */
-    public function test_cannot_add_duplicate_workflow(): void
+    public function testCannotAddDuplicateWorkflow(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Workflow with id "wf-search" already exists');
@@ -377,7 +377,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-workflows
      */
-    public function test_remove_workflow_by_id(): void
+    public function testRemoveWorkflowById(): void
     {
         $capability = $this->createValidCapability();
         $capability->addWorkflow(['id' => 'wf-search', 'name' => 'Search Workflow']);
@@ -390,7 +390,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-workflows
      */
-    public function test_get_workflow_returns_correct_workflow(): void
+    public function testGetWorkflowReturnsCorrectWorkflow(): void
     {
         $capability = $this->createValidCapability();
         $workflow1 = ['id' => 'wf-search', 'name' => 'Search Workflow'];
@@ -406,7 +406,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-workflows
      */
-    public function test_has_workflow_checks_correctly(): void
+    public function testHasWorkflowChecksCorrectly(): void
     {
         $capability = $this->createValidCapability();
         $capability->addWorkflow(['id' => 'wf-search', 'name' => 'Search Workflow']);
@@ -419,7 +419,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-workflows
      */
-    public function test_workflow_must_have_id_field(): void
+    public function testWorkflowMustHaveIdField(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Workflow must have an id field');
@@ -432,7 +432,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-workflows
      */
-    public function test_multiple_workflows_supported(): void
+    public function testMultipleWorkflowsSupported(): void
     {
         $capability = $this->createValidCapability();
         $capability->addWorkflow(['id' => 'wf-1', 'name' => 'Workflow 1']);
@@ -451,7 +451,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-services
      */
-    public function test_add_service_with_valid_structure(): void
+    public function testAddServiceWithValidStructure(): void
     {
         $capability = $this->createValidCapability();
         $service = ['id' => 'svc-search', 'name' => 'Employee Search Service'];
@@ -465,7 +465,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-services
      */
-    public function test_cannot_add_duplicate_service(): void
+    public function testCannotAddDuplicateService(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Service with id "svc-search" already exists');
@@ -479,7 +479,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-services
      */
-    public function test_remove_service_by_id(): void
+    public function testRemoveServiceById(): void
     {
         $capability = $this->createValidCapability();
         $capability->addService(['id' => 'svc-search', 'name' => 'Employee Search Service']);
@@ -492,7 +492,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-services
      */
-    public function test_get_service_returns_correct_service(): void
+    public function testGetServiceReturnsCorrectService(): void
     {
         $capability = $this->createValidCapability();
         $service1 = ['id' => 'svc-search', 'name' => 'Search Service'];
@@ -508,7 +508,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-services
      */
-    public function test_has_service_checks_correctly(): void
+    public function testHasServiceChecksCorrectly(): void
     {
         $capability = $this->createValidCapability();
         $capability->addService(['id' => 'svc-search', 'name' => 'Employee Search Service']);
@@ -521,7 +521,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-services
      */
-    public function test_service_must_have_id_field(): void
+    public function testServiceMustHaveIdField(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Service must have an id field');
@@ -534,7 +534,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-services
      */
-    public function test_multiple_services_supported(): void
+    public function testMultipleServicesSupported(): void
     {
         $capability = $this->createValidCapability();
         $capability->addService(['id' => 'svc-1', 'name' => 'Service 1']);
@@ -553,7 +553,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-kpis
      */
-    public function test_kpis_getter_setter(): void
+    public function testKpisGetterSetter(): void
     {
         $capability = $this->createValidCapability();
         $kpis = [
@@ -569,7 +569,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-kpis
      */
-    public function test_kpis_can_be_empty_array(): void
+    public function testKpisCanBeEmptyArray(): void
     {
         $capability = $this->createValidCapability();
         $capability->setKpis([]);
@@ -581,7 +581,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-kpis
      */
-    public function test_kpi_metadata_preserved(): void
+    public function testKpiMetadataPreserved(): void
     {
         $capability = $this->createValidCapability();
         $kpis = [
@@ -600,7 +600,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-dependencies
      */
-    public function test_add_dependency(): void
+    public function testAddDependency(): void
     {
         $capability = $this->createValidCapability();
         $capability->addDependency('emp-profile');
@@ -612,7 +612,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-dependencies
      */
-    public function test_cannot_add_duplicate_dependency(): void
+    public function testCannotAddDuplicateDependency(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Capability dependency "emp-profile" already exists');
@@ -626,7 +626,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-dependencies
      */
-    public function test_remove_dependency(): void
+    public function testRemoveDependency(): void
     {
         $capability = $this->createValidCapability();
         $capability->addDependency('emp-profile');
@@ -639,7 +639,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-dependencies
      */
-    public function test_has_dependency_checks_correctly(): void
+    public function testHasDependencyChecksCorrectly(): void
     {
         $capability = $this->createValidCapability();
         $capability->addDependency('emp-profile');
@@ -652,7 +652,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-dependencies
      */
-    public function test_get_dependencies_returns_all(): void
+    public function testGetDependenciesReturnsAll(): void
     {
         $capability = $this->createValidCapability();
         $capability->addDependency('emp-profile');
@@ -672,7 +672,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-business-rules
      */
-    public function test_business_rules_getter_setter(): void
+    public function testBusinessRulesGetterSetter(): void
     {
         $capability = $this->createValidCapability();
         $rules = [
@@ -688,7 +688,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-business-rules
      */
-    public function test_can_store_rule_definitions(): void
+    public function testCanStoreRuleDefinitions(): void
     {
         $capability = $this->createValidCapability();
         $capability->setBusinessRules([
@@ -708,7 +708,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-policies
      */
-    public function test_policies_getter_setter(): void
+    public function testPoliciesGetterSetter(): void
     {
         $capability = $this->createValidCapability();
         $policies = [
@@ -724,7 +724,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-policies
      */
-    public function test_can_store_policy_definitions(): void
+    public function testCanStorePolicyDefinitions(): void
     {
         $capability = $this->createValidCapability();
         $capability->setPolicies([
@@ -744,7 +744,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-events
      */
-    public function test_events_getter_setter(): void
+    public function testEventsGetterSetter(): void
     {
         $capability = $this->createValidCapability();
         $events = [
@@ -760,7 +760,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-events
      */
-    public function test_can_store_event_definitions(): void
+    public function testCanStoreEventDefinitions(): void
     {
         $capability = $this->createValidCapability();
         $capability->setEvents([
@@ -784,7 +784,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-serialization
      */
-    public function test_to_array_returns_all_fields(): void
+    public function testToArrayReturnsAllFields(): void
     {
         $capability = $this->createValidCapability();
         $capability->setKpis([['name' => 'Efficiency', 'target' => 95]]);
@@ -807,7 +807,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-serialization
      */
-    public function test_to_json_returns_valid_json_string(): void
+    public function testToJsonReturnsValidJsonString(): void
     {
         $capability = $this->createValidCapability();
 
@@ -823,7 +823,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-serialization
      */
-    public function test_json_serializable_works(): void
+    public function testJsonSerializableWorks(): void
     {
         $capability = $this->createValidCapability();
 
@@ -838,7 +838,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-serialization
      */
-    public function test_timestamps_in_iso_8601_format(): void
+    public function testTimestampsInIso8601Format(): void
     {
         $capability = $this->createValidCapability();
 
@@ -857,7 +857,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-validation
      */
-    public function test_valid_capability_passes_validation(): void
+    public function testValidCapabilityPassesValidation(): void
     {
         $capability = $this->createValidCapability();
 
@@ -869,15 +869,15 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-validation
      */
-    public function test_missing_capability_id_fails_validation(): void
+    public function testMissingCapabilityIdFailsValidation(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Capability ID is required');
 
         $capability = new BusinessCapability();
-        
+
         $reflection = new \ReflectionClass($capability);
-        
+
         // Set all fields except capabilityId (which is empty by default)
         $reflection->getProperty('capabilityName')->setValue($capability, 'Employee Search');
         $reflection->getProperty('description')->setValue($capability, 'Search employees');
@@ -885,7 +885,7 @@ class BusinessCapabilityTest extends TestCase
         $reflection->getProperty('businessOwner')->setValue($capability, 'hr-manager-001');
         $reflection->getProperty('status')->setValue($capability, BusinessCapability::IMPLEMENT);
         $reflection->getProperty('businessOutcome')->setValue($capability, 'Find employees quickly');
-        
+
         // Try to initialize - should fail because capabilityId is empty
         $initMethod = $reflection->getMethod('initializeCapability');
         $initMethod->invoke($capability);
@@ -895,18 +895,18 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-validation
      */
-    public function test_missing_required_fields_fail_validation(): void
+    public function testMissingRequiredFieldsFailValidation(): void
     {
         $this->expectException(\InvalidArgumentException::class);
 
         $capability = new BusinessCapability();
-        
+
         $reflection = new \ReflectionClass($capability);
-        
+
         // Set only capabilityId, leave others empty
         $reflection->getProperty('capabilityId')->setValue($capability, 'emp-search');
         // capabilityName is empty by default
-        
+
         // Try to initialize - should fail
         $initMethod = $reflection->getMethod('initializeCapability');
         $initMethod->invoke($capability);
@@ -920,7 +920,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-version
      */
-    public function test_entity_version_inherited_from_base_model(): void
+    public function testEntityVersionInheritedFromBaseModel(): void
     {
         $capability = $this->createValidCapability();
 
@@ -931,7 +931,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-version
      */
-    public function test_entity_type_set_to_capability(): void
+    public function testEntityTypeSetToCapability(): void
     {
         $capability = $this->createValidCapability();
 
@@ -942,7 +942,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-version
      */
-    public function test_version_tracked_by_base_model(): void
+    public function testVersionTrackedByBaseModel(): void
     {
         $capability = $this->createValidCapability();
 
@@ -959,7 +959,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-framework-independence
      */
-    public function test_no_laravel_objects_in_to_array(): void
+    public function testNoLaravelObjectsInToArray(): void
     {
         $capability = $this->createValidCapability();
 
@@ -978,7 +978,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-framework-independence
      */
-    public function test_serialization_produces_pure_json(): void
+    public function testSerializationProducesPureJson(): void
     {
         $capability = $this->createValidCapability();
 
@@ -998,7 +998,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-hierarchy
      */
-    public function test_capability_remains_in_domain_hierarchy(): void
+    public function testCapabilityRemainsInDomainHierarchy(): void
     {
         $capability = $this->createValidCapability();
 
@@ -1010,7 +1010,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-hierarchy
      */
-    public function test_parent_domain_reference_preserved(): void
+    public function testParentDomainReferencePreserved(): void
     {
         $capability = $this->createValidCapability();
 
@@ -1025,7 +1025,7 @@ class BusinessCapabilityTest extends TestCase
      * @test
      * @group capability-string
      */
-    public function test_string_representation(): void
+    public function testStringRepresentation(): void
     {
         $capability = $this->createValidCapability();
 

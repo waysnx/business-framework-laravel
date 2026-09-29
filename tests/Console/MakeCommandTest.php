@@ -264,7 +264,7 @@ class MakeCommandTest extends TestCase
 
         $this->assertTrue($result->isSuccess());
         $files = $result->getFiles();
-        
+
         // Should generate both Definition and Model
         $this->assertCount(2, $files, 'Should generate 2 files: Definition and Model');
 
@@ -314,12 +314,12 @@ class MakeCommandTest extends TestCase
 
         // Read the generated content and verify no recursive calls
         $content = file_get_contents($modelFile);
-        
+
         // Check that addKpi() and setSla() don't exist in the generated class
         // (they were removed to avoid recursion)
         $this->assertStringNotContainsString('public function addKpi', $content);
         $this->assertStringNotContainsString('public function setSla', $content);
-        
+
         // Verify comments show how to use parent methods
         $this->assertStringContainsString('addKpi', $content); // In comments
         $this->assertStringContainsString('setSla', $content); // In comments
@@ -346,7 +346,7 @@ class MakeCommandTest extends TestCase
 
         $this->assertTrue($result->isSuccess());
         $filePath = $result->getFiles()[0];
-        
+
         $content = file_get_contents($filePath);
         $this->assertStringContainsString("namespace {$namespace}", $content);
     }

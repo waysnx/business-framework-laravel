@@ -257,7 +257,7 @@ class MakeCommand extends BaseWbfCommand
 
         try {
             $generator = $this->createGenerator($type, $name, $module, $namespace, $outputPath);
-            
+
             if ($generator === null) {
                 return [
                     'success' => false,
@@ -269,7 +269,7 @@ class MakeCommand extends BaseWbfCommand
             // Check for file conflicts BEFORE generating anything (atomic behavior)
             $force = $this->option('force') === true;
             $conflictingFiles = $this->getConflictingFiles($type, $name, $outputPath);
-            
+
             if (!empty($conflictingFiles) && !$force) {
                 $fileList = implode(', ', $conflictingFiles);
                 return [

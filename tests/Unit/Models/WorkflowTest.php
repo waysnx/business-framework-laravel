@@ -73,7 +73,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-creation
      */
-    public function test_can_create_valid_workflow(): void
+    public function testCanCreateValidWorkflow(): void
     {
         $workflow = $this->createValidWorkflow();
 
@@ -86,7 +86,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-creation
      */
-    public function test_creation_initializes_base_model_fields(): void
+    public function testCreationInitializesBaseModelFields(): void
     {
         $workflow = $this->createValidWorkflow();
 
@@ -101,7 +101,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-initialization
      */
-    public function test_initialize_sets_default_values(): void
+    public function testInitializeSetsDefaultValues(): void
     {
         $workflow = new Workflow();
         $workflow->initialize();
@@ -125,7 +125,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-identity
      */
-    public function test_can_set_and_get_workflow_id(): void
+    public function testCanSetAndGetWorkflowId(): void
     {
         $workflow = $this->createValidWorkflow();
         $workflow->setWorkflowId('new-workflow-id');
@@ -137,7 +137,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-identity
      */
-    public function test_workflow_id_cannot_be_empty(): void
+    public function testWorkflowIdCannotBeEmpty(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $workflow = $this->createValidWorkflow();
@@ -148,7 +148,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-identity
      */
-    public function test_can_set_and_get_workflow_name(): void
+    public function testCanSetAndGetWorkflowName(): void
     {
         $workflow = $this->createValidWorkflow();
         $workflow->setWorkflowName('New Name');
@@ -160,7 +160,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-identity
      */
-    public function test_workflow_name_cannot_be_empty(): void
+    public function testWorkflowNameCannotBeEmpty(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $workflow = $this->createValidWorkflow();
@@ -171,7 +171,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-identity
      */
-    public function test_can_set_and_get_description(): void
+    public function testCanSetAndGetDescription(): void
     {
         $workflow = $this->createValidWorkflow();
         $workflow->setDescription('New description');
@@ -183,7 +183,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-identity
      */
-    public function test_description_cannot_be_empty(): void
+    public function testDescriptionCannotBeEmpty(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $workflow = $this->createValidWorkflow();
@@ -198,7 +198,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-relationships
      */
-    public function test_can_set_and_get_capability_id(): void
+    public function testCanSetAndGetCapabilityId(): void
     {
         $workflow = $this->createValidWorkflow();
         $workflow->setCapabilityId('new-capability');
@@ -210,7 +210,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-relationships
      */
-    public function test_capability_id_cannot_be_empty(): void
+    public function testCapabilityIdCannotBeEmpty(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $workflow = $this->createValidWorkflow();
@@ -221,7 +221,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-relationships
      */
-    public function test_capability_id_can_be_integer(): void
+    public function testCapabilityIdCanBeInteger(): void
     {
         $workflow = $this->createValidWorkflow();
         $workflow->setCapabilityId(123);
@@ -233,7 +233,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-governance
      */
-    public function test_can_set_and_get_business_owner(): void
+    public function testCanSetAndGetBusinessOwner(): void
     {
         $workflow = $this->createValidWorkflow();
         $workflow->setBusinessOwner('new-owner');
@@ -245,7 +245,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-governance
      */
-    public function test_business_owner_cannot_be_empty(): void
+    public function testBusinessOwnerCannotBeEmpty(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $workflow = $this->createValidWorkflow();
@@ -256,7 +256,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-governance
      */
-    public function test_business_owner_can_be_integer(): void
+    public function testBusinessOwnerCanBeInteger(): void
     {
         $workflow = $this->createValidWorkflow();
         $workflow->setBusinessOwner(456);
@@ -272,7 +272,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-lifecycle
      */
-    public function test_has_six_lifecycle_states(): void
+    public function testHasSixLifecycleStates(): void
     {
         $this->assertEquals('Draft', Workflow::DRAFT);
         $this->assertEquals('Review', Workflow::REVIEW);
@@ -286,7 +286,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-lifecycle
      */
-    public function test_can_set_valid_status(): void
+    public function testCanSetValidStatus(): void
     {
         $workflow = $this->createValidWorkflow();
 
@@ -313,7 +313,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-lifecycle
      */
-    public function test_cannot_set_invalid_status(): void
+    public function testCannotSetInvalidStatus(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $workflow = $this->createValidWorkflow();
@@ -324,7 +324,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-lifecycle
      */
-    public function test_status_helper_methods(): void
+    public function testStatusHelperMethods(): void
     {
         $workflow = $this->createValidWorkflow();
 
@@ -356,7 +356,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-definition
      */
-    public function test_can_set_and_get_workflow_definition_id(): void
+    public function testCanSetAndGetWorkflowDefinitionId(): void
     {
         $workflow = $this->createValidWorkflow();
         $workflow->setWorkflowDefinitionId('def-123');
@@ -368,7 +368,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-definition
      */
-    public function test_workflow_definition_id_is_optional(): void
+    public function testWorkflowDefinitionIdIsOptional(): void
     {
         $workflow = new Workflow();
         $reflection = new \ReflectionClass($workflow);
@@ -385,7 +385,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-definition
      */
-    public function test_can_check_has_workflow_definition(): void
+    public function testCanCheckHasWorkflowDefinition(): void
     {
         $workflow = $this->createValidWorkflow();
 
@@ -404,7 +404,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-trigger
      */
-    public function test_can_set_and_get_trigger(): void
+    public function testCanSetAndGetTrigger(): void
     {
         $workflow = $this->createValidWorkflow();
         $workflow->setTrigger('employee-created');
@@ -416,7 +416,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-inputs-outputs
      */
-    public function test_can_set_and_get_inputs(): void
+    public function testCanSetAndGetInputs(): void
     {
         $workflow = $this->createValidWorkflow();
         $inputs = [
@@ -432,7 +432,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-inputs-outputs
      */
-    public function test_can_set_and_get_outputs(): void
+    public function testCanSetAndGetOutputs(): void
     {
         $workflow = $this->createValidWorkflow();
         $outputs = [
@@ -452,7 +452,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-services
      */
-    public function test_can_add_services(): void
+    public function testCanAddServices(): void
     {
         $workflow = $this->createValidWorkflow();
 
@@ -468,7 +468,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-services
      */
-    public function test_cannot_add_empty_service(): void
+    public function testCannotAddEmptyService(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $workflow = $this->createValidWorkflow();
@@ -479,7 +479,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-services
      */
-    public function test_cannot_add_duplicate_service(): void
+    public function testCannotAddDuplicateService(): void
     {
         $workflow = $this->createValidWorkflow();
         $workflow->addService('email-service');
@@ -492,7 +492,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-services
      */
-    public function test_can_remove_service(): void
+    public function testCanRemoveService(): void
     {
         $workflow = $this->createValidWorkflow();
         $workflow->addService('email-service');
@@ -509,7 +509,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-services
      */
-    public function test_get_services_count(): void
+    public function testGetServicesCount(): void
     {
         $workflow = $this->createValidWorkflow();
 
@@ -530,7 +530,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-steps
      */
-    public function test_can_add_steps(): void
+    public function testCanAddSteps(): void
     {
         $workflow = $this->createValidWorkflow();
 
@@ -545,7 +545,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-steps
      */
-    public function test_cannot_add_empty_step(): void
+    public function testCannotAddEmptyStep(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $workflow = $this->createValidWorkflow();
@@ -556,7 +556,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-steps
      */
-    public function test_cannot_add_duplicate_step(): void
+    public function testCannotAddDuplicateStep(): void
     {
         $workflow = $this->createValidWorkflow();
         $workflow->addStep('step-1');
@@ -569,7 +569,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-steps
      */
-    public function test_can_remove_step(): void
+    public function testCanRemoveStep(): void
     {
         $workflow = $this->createValidWorkflow();
         $workflow->addStep('step-1');
@@ -585,7 +585,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-steps
      */
-    public function test_get_steps_count(): void
+    public function testGetStepsCount(): void
     {
         $workflow = $this->createValidWorkflow();
 
@@ -605,7 +605,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-kpis
      */
-    public function test_can_add_kpis(): void
+    public function testCanAddKpis(): void
     {
         $workflow = $this->createValidWorkflow();
 
@@ -620,7 +620,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-kpis
      */
-    public function test_cannot_add_empty_kpi(): void
+    public function testCannotAddEmptyKpi(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $workflow = $this->createValidWorkflow();
@@ -631,7 +631,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-kpis
      */
-    public function test_can_remove_kpi(): void
+    public function testCanRemoveKpi(): void
     {
         $workflow = $this->createValidWorkflow();
         $workflow->addKpi('kpi-1');
@@ -647,7 +647,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-kpis
      */
-    public function test_can_set_all_kpis(): void
+    public function testCanSetAllKpis(): void
     {
         $workflow = $this->createValidWorkflow();
         $kpis = ['kpi-1', 'kpi-2', 'kpi-3'];
@@ -662,7 +662,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-kpis
      */
-    public function test_get_kpi_count(): void
+    public function testGetKpiCount(): void
     {
         $workflow = $this->createValidWorkflow();
 
@@ -683,7 +683,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-dependencies
      */
-    public function test_can_add_dependencies(): void
+    public function testCanAddDependencies(): void
     {
         $workflow = $this->createValidWorkflow();
 
@@ -698,7 +698,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-dependencies
      */
-    public function test_cannot_add_empty_dependency(): void
+    public function testCannotAddEmptyDependency(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $workflow = $this->createValidWorkflow();
@@ -709,7 +709,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-dependencies
      */
-    public function test_cannot_add_self_dependency(): void
+    public function testCannotAddSelfDependency(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $workflow = $this->createValidWorkflow();
@@ -720,7 +720,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-dependencies
      */
-    public function test_can_remove_dependency(): void
+    public function testCanRemoveDependency(): void
     {
         $workflow = $this->createValidWorkflow();
         $workflow->addDependency('dep-1');
@@ -736,7 +736,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-dependencies
      */
-    public function test_can_set_all_dependencies(): void
+    public function testCanSetAllDependencies(): void
     {
         $workflow = $this->createValidWorkflow();
         $deps = ['pre-hire', 'verification', 'approval'];
@@ -751,7 +751,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-dependencies
      */
-    public function test_get_dependency_count(): void
+    public function testGetDependencyCount(): void
     {
         $workflow = $this->createValidWorkflow();
 
@@ -771,7 +771,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-sla
      */
-    public function test_can_set_and_get_sla(): void
+    public function testCanSetAndGetSla(): void
     {
         $workflow = $this->createValidWorkflow();
         $workflow->setSla('5 business days');
@@ -783,7 +783,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-sla
      */
-    public function test_sla_is_optional(): void
+    public function testSlaIsOptional(): void
     {
         $workflow = new Workflow();
         $reflection = new \ReflectionClass($workflow);
@@ -804,7 +804,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-serialization
      */
-    public function test_can_convert_to_array(): void
+    public function testCanConvertToArray(): void
     {
         $workflow = $this->createValidWorkflow();
         $workflow->addService('email-service');
@@ -827,7 +827,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-serialization
      */
-    public function test_can_convert_to_json(): void
+    public function testCanConvertToJson(): void
     {
         $workflow = $this->createValidWorkflow();
 
@@ -845,7 +845,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-serialization
      */
-    public function test_json_serializable(): void
+    public function testJsonSerializable(): void
     {
         $workflow = $this->createValidWorkflow();
 
@@ -860,7 +860,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-serialization
      */
-    public function test_can_convert_to_string(): void
+    public function testCanConvertToString(): void
     {
         $workflow = $this->createValidWorkflow();
 
@@ -878,7 +878,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-validation
      */
-    public function test_validate_mandatory_fields(): void
+    public function testValidateMandatoryFields(): void
     {
         $workflow = new Workflow();
         $reflection = new \ReflectionClass($workflow);
@@ -894,7 +894,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-validation
      */
-    public function test_validate_requires_workflow_id(): void
+    public function testValidateRequiresWorkflowId(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Workflow ID is required');
@@ -911,7 +911,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-validation
      */
-    public function test_validate_requires_workflow_name(): void
+    public function testValidateRequiresWorkflowName(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Workflow Name is required');
@@ -928,7 +928,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-validation
      */
-    public function test_validate_requires_description(): void
+    public function testValidateRequiresDescription(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Workflow Description is required');
@@ -945,7 +945,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-validation
      */
-    public function test_validate_requires_capability_id(): void
+    public function testValidateRequiresCapabilityId(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Capability ID (parent) is required');
@@ -962,7 +962,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-validation
      */
-    public function test_validate_requires_business_owner(): void
+    public function testValidateRequiresBusinessOwner(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Business Owner is required');
@@ -979,7 +979,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-validation
      */
-    public function test_validate_requires_valid_status(): void
+    public function testValidateRequiresValidStatus(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid status');
@@ -1000,7 +1000,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-architecture
      */
-    public function test_workflow_is_mutable_business_entity(): void
+    public function testWorkflowIsMutableBusinessEntity(): void
     {
         $workflow = $this->createValidWorkflow();
 
@@ -1022,7 +1022,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-coexistence
      */
-    public function test_workflow_references_definition_does_not_duplicate(): void
+    public function testWorkflowReferencesDefinitionDoesNotDuplicate(): void
     {
         $workflow = $this->createValidWorkflow();
 
@@ -1050,7 +1050,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-framework-independence
      */
-    public function test_workflow_abstract_has_no_framework_dependencies(): void
+    public function testWorkflowAbstractHasNoFrameworkDependencies(): void
     {
         $workflow = $this->createValidWorkflow();
 
@@ -1069,7 +1069,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-hierarchy
      */
-    public function test_workflow_belongs_to_capability(): void
+    public function testWorkflowBelongsToCapability(): void
     {
         $workflow = $this->createValidWorkflow();
 
@@ -1079,7 +1079,7 @@ class WorkflowTest extends TestCase
         // Capability ID should be set
         $this->assertEquals('employee-management', $workflow->getCapabilityId());
 
-        // Workflow hierarchy: Capability → Workflow → Service/Step
+        // Workflow hierarchy: Capability â†’ Workflow â†’ Service/Step
         // (Workflow sits between Capability and Service/Step layers)
         $this->assertTrue(true);
     }
@@ -1088,7 +1088,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-version-consistency
      */
-    public function test_workflow_version_increments(): void
+    public function testWorkflowVersionIncrements(): void
     {
         $workflow = $this->createValidWorkflow();
 
@@ -1102,7 +1102,7 @@ class WorkflowTest extends TestCase
      * @test
      * @group workflow-lifecycle
      */
-    public function test_workflow_lifecycle_transition(): void
+    public function testWorkflowLifecycleTransition(): void
     {
         $workflow = $this->createValidWorkflow();
 

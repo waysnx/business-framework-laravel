@@ -309,6 +309,4 @@ class ShowCommand extends BaseWbfCommand
             return null;
         }
     }
-
-
 }

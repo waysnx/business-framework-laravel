@@ -72,7 +72,7 @@ class ApplyLeaveTest extends TestCase
      *
      * Validates the happy path: valid request from active employee with sufficient balance
      */
-    public function test_valid_annual_leave_request_succeeds(): void
+    public function testValidAnnualLeaveRequestSucceeds(): void
     {
         $request = [
             'employeeId' => 'EMP-2026-001',
@@ -106,7 +106,7 @@ class ApplyLeaveTest extends TestCase
      *
      * Tests authorization: Manager applying on behalf of subordinate
      */
-    public function test_manager_can_apply_leave_for_direct_report(): void
+    public function testManagerCanApplyLeaveForDirectReport(): void
     {
         // Jane Manager (EMP-2026-005) applying for Alice Johnson (EMP-2026-001)
         $request = [
@@ -132,7 +132,7 @@ class ApplyLeaveTest extends TestCase
      *
      * Tests authorization: HR Admin has full permissions
      */
-    public function test_hr_admin_can_apply_leave_for_any_employee(): void
+    public function testHrAdminCanApplyLeaveForAnyEmployee(): void
     {
         $request = [
             'employeeId' => 'EMP-2026-002',
@@ -157,7 +157,7 @@ class ApplyLeaveTest extends TestCase
      *
      * Tests business logic: Annual leave ≤3 days auto-approves
      */
-    public function test_short_annual_leave_auto_approves(): void
+    public function testShortAnnualLeaveAutoApproves(): void
     {
         $request = [
             'employeeId' => 'EMP-2026-004',
@@ -183,7 +183,7 @@ class ApplyLeaveTest extends TestCase
      *
      * Verifies balance calculation: current - requested = remaining
      */
-    public function test_remaining_balance_calculated_correctly(): void
+    public function testRemainingBalanceCalculatedCorrectly(): void
     {
         $request = [
             'employeeId' => 'EMP-2026-002', // Has 18 Annual days
@@ -209,7 +209,7 @@ class ApplyLeaveTest extends TestCase
      *
      * Verifies that the Runtime successfully orchestrates ApplyLeave
      */
-    public function test_runtime_executes_real_apply_leave(): void
+    public function testRuntimeExecutesRealApplyLeave(): void
     {
         $request = [
             'employeeId' => 'EMP-2026-004',
@@ -244,7 +244,7 @@ class ApplyLeaveTest extends TestCase
      *
      * Validates date format checking in validateRequest()
      */
-    public function test_invalid_date_format_fails_validation(): void
+    public function testInvalidDateFormatFailsValidation(): void
     {
         $request = [
             'employeeId' => 'EMP-2026-001',
@@ -269,7 +269,7 @@ class ApplyLeaveTest extends TestCase
      *
      * Validates logical date constraints
      */
-    public function test_start_date_after_end_date_fails_validation(): void
+    public function testStartDateAfterEndDateFailsValidation(): void
     {
         $request = [
             'employeeId' => 'EMP-2026-001',
@@ -294,7 +294,7 @@ class ApplyLeaveTest extends TestCase
      *
      * Validates that leave cannot be requested for past dates
      */
-    public function test_past_date_fails_validation(): void
+    public function testPastDateFailsValidation(): void
     {
         $request = [
             'employeeId' => 'EMP-2026-001',
@@ -319,7 +319,7 @@ class ApplyLeaveTest extends TestCase
      *
      * Validates leave type enum constraint
      */
-    public function test_invalid_leave_type_fails_validation(): void
+    public function testInvalidLeaveTypeFailsValidation(): void
     {
         $request = [
             'employeeId' => 'EMP-2026-001',
@@ -348,7 +348,7 @@ class ApplyLeaveTest extends TestCase
      *
      * Validates authorization: Employee role scope
      */
-    public function test_employee_cannot_apply_leave_for_others(): void
+    public function testEmployeeCannotApplyLeaveForOthers(): void
     {
         $request = [
             'employeeId' => 'EMP-2026-002', // Different employee
@@ -373,7 +373,7 @@ class ApplyLeaveTest extends TestCase
      *
      * Validates authorization: Manager scope limited to direct reports
      */
-    public function test_manager_cannot_apply_leave_for_non_reports(): void
+    public function testManagerCannotApplyLeaveForNonReports(): void
     {
         // Sales Manager (EMP-2026-006) trying to apply for Engineering employee (EMP-2026-001)
         $request = [
@@ -399,7 +399,7 @@ class ApplyLeaveTest extends TestCase
      *
      * Validates that authorization always requires caller context
      */
-    public function test_missing_caller_context_fails_authorization(): void
+    public function testMissingCallerContextFailsAuthorization(): void
     {
         $request = [
             'employeeId' => 'EMP-2026-001',
@@ -423,7 +423,7 @@ class ApplyLeaveTest extends TestCase
      *
      * Validates business rule: Employee must be active
      */
-    public function test_inactive_employee_cannot_apply_leave(): void
+    public function testInactiveEmployeeCannotApplyLeave(): void
     {
         // Carol Davis (EMP-2026-003) has status = 'Inactive'
         $request = [
@@ -449,7 +449,7 @@ class ApplyLeaveTest extends TestCase
      *
      * Validates business rule: Must have sufficient balance
      */
-    public function test_insufficient_leave_balance_fails(): void
+    public function testInsufficientLeaveBalanceFails(): void
     {
         // Alice (EMP-2026-001) has only 15 Annual days
         $request = [
@@ -475,7 +475,7 @@ class ApplyLeaveTest extends TestCase
      *
      * Validates business rule: No overlapping approved leave
      */
-    public function test_overlapping_approved_leave_fails(): void
+    public function testOverlappingApprovedLeaveFails(): void
     {
         // Alice (EMP-2026-001) already has approved leave 90-94 days in future
         // Trying to request 92-97 days in future (overlaps)
@@ -502,7 +502,7 @@ class ApplyLeaveTest extends TestCase
      *
      * Validates business rule: Maximum consecutive days constraint
      */
-    public function test_exceeds_maximum_consecutive_days_fails(): void
+    public function testExceedsMaximumConsecutiveDaysFails(): void
     {
         // Sick leave has max 5 consecutive days
         $request = [
@@ -528,7 +528,7 @@ class ApplyLeaveTest extends TestCase
      *
      * Edge case: Single day (start = end)
      */
-    public function test_single_day_leave_succeeds(): void
+    public function testSingleDayLeaveSucceeds(): void
     {
         $request = [
             'employeeId' => 'EMP-2026-002',
@@ -557,7 +557,7 @@ class ApplyLeaveTest extends TestCase
      *
      * Validates that events are published after successful execution
      */
-    public function test_leave_requested_event_published_on_success(): void
+    public function testLeaveRequestedEventPublishedOnSuccess(): void
     {
         $request = [
             'employeeId' => 'EMP-2026-004',
@@ -583,7 +583,7 @@ class ApplyLeaveTest extends TestCase
      *
      * Validates response contract compliance
      */
-    public function test_response_follows_contract(): void
+    public function testResponseFollowsContract(): void
     {
         $request = [
             'employeeId' => 'EMP-2026-002',
@@ -620,7 +620,7 @@ class ApplyLeaveTest extends TestCase
      *
      * Validates that the BFD is preserved and matches implementation
      */
-    public function test_bfd_remains_accurate(): void
+    public function testBfdRemainsAccurate(): void
     {
         $bfd = $this->applyLeave->getCompleteContractDefinition();
 
@@ -648,7 +648,7 @@ class ApplyLeaveTest extends TestCase
      *
      * Verifies that leave requests are persisted (in-memory for this test)
      */
-    public function test_created_leave_request_is_stored(): void
+    public function testCreatedLeaveRequestIsStored(): void
     {
         $request = [
             'employeeId' => 'EMP-2026-004',
@@ -677,7 +677,7 @@ class ApplyLeaveTest extends TestCase
      *
      * Tests that multiple requests can be submitted independently
      */
-    public function test_multiple_leave_requests_can_be_created(): void
+    public function testMultipleLeaveRequestsCanBeCreated(): void
     {
         $caller1 = ['id' => 'EMP-2026-001', 'role' => 'Employee'];
         $caller2 = ['id' => 'EMP-2026-002', 'role' => 'Employee'];

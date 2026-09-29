@@ -303,6 +303,4 @@ class ListCommand extends BaseWbfCommand
             ];
         }, $entities);
     }
-
-
 }

@@ -70,7 +70,7 @@ class WorkflowEngineTest extends TestCase
 
         $this->registry->register($workflow);
 
-        $engine = new class($this->registry, $this->lifecycleManager) extends WorkflowEngine {
+        $engine = new class ($this->registry, $this->lifecycleManager) extends WorkflowEngine {
             protected function executeBusinessFunction(string $functionId, $context): void
             {
                 // Function succeeds
@@ -133,7 +133,7 @@ class WorkflowEngineTest extends TestCase
 
         $executedFunctions = [];
 
-        $engine = new class($this->registry, $this->lifecycleManager) extends WorkflowEngine {
+        $engine = new class ($this->registry, $this->lifecycleManager) extends WorkflowEngine {
             public $executedFunctions = [];
 
             protected function executeBusinessFunction(string $functionId, $context): void
@@ -188,7 +188,7 @@ class WorkflowEngineTest extends TestCase
 
         $this->registry->register($workflow);
 
-        $engine = new class($this->registry, $this->lifecycleManager) extends WorkflowEngine {
+        $engine = new class ($this->registry, $this->lifecycleManager) extends WorkflowEngine {
             protected function executeBusinessFunction(string $functionId, $context): void
             {
                 if ($functionId === 'failing-func') {
@@ -235,7 +235,7 @@ class WorkflowEngineTest extends TestCase
 
         $receivedContext = null;
 
-        $engine = new class($this->registry, $this->lifecycleManager) extends WorkflowEngine {
+        $engine = new class ($this->registry, $this->lifecycleManager) extends WorkflowEngine {
             public $receivedContext = null;
 
             protected function executeBusinessFunction(string $functionId, $context): void
@@ -293,7 +293,7 @@ class WorkflowEngineTest extends TestCase
         $this->lifecycleManager->register(
             new \WaysNX\BusinessFramework\Lifecycle\LifecycleHandler(
                 id: 'before-handler',
-                callable: function() use (&$events) {
+                callable: function () use (&$events) {
                     $events[] = 'beforeWorkflow';
                 },
                 supportedEvents: ['beforeWorkflow']
@@ -303,7 +303,7 @@ class WorkflowEngineTest extends TestCase
         $this->lifecycleManager->register(
             new \WaysNX\BusinessFramework\Lifecycle\LifecycleHandler(
                 id: 'after-handler',
-                callable: function() use (&$events) {
+                callable: function () use (&$events) {
                     $events[] = 'afterWorkflow';
                 },
                 supportedEvents: ['afterWorkflow']
@@ -313,14 +313,14 @@ class WorkflowEngineTest extends TestCase
         $this->lifecycleManager->register(
             new \WaysNX\BusinessFramework\Lifecycle\LifecycleHandler(
                 id: 'completed-handler',
-                callable: function() use (&$events) {
+                callable: function () use (&$events) {
                     $events[] = 'workflowCompleted';
                 },
                 supportedEvents: ['workflowCompleted']
             )
         );
 
-        $engine = new class($this->registry, $this->lifecycleManager) extends WorkflowEngine {
+        $engine = new class ($this->registry, $this->lifecycleManager) extends WorkflowEngine {
             protected function executeBusinessFunction(string $functionId, $context): void
             {
                 // Success
@@ -372,7 +372,7 @@ class WorkflowEngineTest extends TestCase
 
         $this->registry->register($workflow);
 
-        $engine = new class($this->registry, $this->lifecycleManager) extends WorkflowEngine {
+        $engine = new class ($this->registry, $this->lifecycleManager) extends WorkflowEngine {
             protected function executeBusinessFunction(string $functionId, $context): void
             {
                 // Success
@@ -417,7 +417,7 @@ class WorkflowEngineTest extends TestCase
 
         $this->registry->register($workflow);
 
-        $engine = new class($this->registry, $this->lifecycleManager) extends WorkflowEngine {
+        $engine = new class ($this->registry, $this->lifecycleManager) extends WorkflowEngine {
             public $calls = [];
 
             protected function beforeExecute($workflow, $context): void
@@ -504,7 +504,7 @@ class WorkflowEngineTest extends TestCase
 
         $this->registry->register($workflow);
 
-        $engine = new class($this->registry) extends WorkflowEngine {
+        $engine = new class ($this->registry) extends WorkflowEngine {
             protected function executeBusinessFunction(string $functionId, $context): void
             {
                 // Success
@@ -584,7 +584,7 @@ class WorkflowEngineTest extends TestCase
 
         $this->registry->register($workflow);
 
-        $engine = new class($this->registry, $this->lifecycleManager) extends WorkflowEngine {
+        $engine = new class ($this->registry, $this->lifecycleManager) extends WorkflowEngine {
             protected function executeBusinessFunction(string $functionId, $context): void
             {
                 // Success

@@ -140,7 +140,7 @@ class CanonicalBFDTest extends TestCase
      * Requirement: BFD MUST contain identity, metadata, contract, processing, operational
      * WBF-DOC-0005 Section 6: Canonical Business Function Model
      */
-    public function test_bfd_contains_all_required_sections(): void
+    public function testBfdContainsAllRequiredSections(): void
     {
         $requiredSections = ['identity', 'metadata', 'contract', 'processing', 'operational'];
 
@@ -163,7 +163,7 @@ class CanonicalBFDTest extends TestCase
      * Requirements: BF-ID-01 through BF-ID-07
      * WBF-DOC-0005 Section 8: Function Identity
      */
-    public function test_bfd_identity_is_complete(): void
+    public function testBfdIdentityIsComplete(): void
     {
         $identity = $this->canonicalBFD['identity'];
 
@@ -201,7 +201,7 @@ class CanonicalBFDTest extends TestCase
      * Requirements: BF-META-01 through BF-META-10
      * WBF-DOC-0005 Section 9: Function Metadata
      */
-    public function test_bfd_metadata_is_complete(): void
+    public function testBfdMetadataIsComplete(): void
     {
         $metadata = $this->canonicalBFD['metadata'];
 
@@ -238,7 +238,7 @@ class CanonicalBFDTest extends TestCase
      * Requirements: BF-CON-01 through BF-CON-05, BF-REQ-01, BF-RESP-01
      * WBF-DOC-0005 Section 10: Business Contract
      */
-    public function test_bfd_contract_is_complete(): void
+    public function testBfdContractIsComplete(): void
     {
         $contract = $this->canonicalBFD['contract'];
 
@@ -273,7 +273,7 @@ class CanonicalBFDTest extends TestCase
      * Requirements: BF-VAL-01 through BF-VAL-06, BF-SEC-01 through BF-SEC-05, BF-BR-01 through BF-BR-05
      * WBF-DOC-0005 Section 13-16: Execution Pipeline
      */
-    public function test_bfd_processing_is_complete(): void
+    public function testBfdProcessingIsComplete(): void
     {
         $processing = $this->canonicalBFD['processing'];
 
@@ -307,7 +307,7 @@ class CanonicalBFDTest extends TestCase
      * Requirements: BF-OBS-01 through BF-OBS-05, BF-OBS-04
      * WBF-DOC-0005 Section 20: Observability
      */
-    public function test_bfd_operational_is_complete(): void
+    public function testBfdOperationalIsComplete(): void
     {
         $operational = $this->canonicalBFD['operational'];
 
@@ -338,7 +338,7 @@ class CanonicalBFDTest extends TestCase
      * Requirement: BFD MUST be machine-readable and exchangeable
      * WBF-DOC-0005 Section 25: Business Function Definition (BFD)
      */
-    public function test_bfd_is_json_serializable(): void
+    public function testBfdIsJsonSerializable(): void
     {
         $json = json_encode($this->canonicalBFD);
 
@@ -359,7 +359,7 @@ class CanonicalBFDTest extends TestCase
      * Requirement: BFD MUST be framework-independent
      * WBF-DOC-0005 Section 2: Technology Independence
      */
-    public function test_bfd_contains_no_framework_objects(): void
+    public function testBfdContainsNoFrameworkObjects(): void
     {
         $json = json_encode($this->canonicalBFD);
         $this->assertNotFalse($json, 'BFD must be JSON serializable without special handling');
@@ -377,7 +377,7 @@ class CanonicalBFDTest extends TestCase
      * Requirement: BF-GOAL-03 - Deterministic Behavior
      * Same BF state MUST always produce identical canonical output
      */
-    public function test_bfd_is_deterministic(): void
+    public function testBfdIsDeterministic(): void
     {
         // Serialize the same BF multiple times
         $serialization1 = $this->businessFunction->getCompleteContractDefinition();
@@ -402,7 +402,7 @@ class CanonicalBFDTest extends TestCase
      *
      * Verify that all interface methods are represented in the BFD
      */
-    public function test_bfd_covers_all_interface_methods(): void
+    public function testBfdCoversAllInterfaceMethods(): void
     {
         // BFD should contain data from all interface method groups
         $bfd = $this->canonicalBFD;
@@ -448,7 +448,7 @@ class CanonicalBFDTest extends TestCase
      *
      * Verify that the BFD can be persisted and reloaded without corruption
      */
-    public function test_bfd_fixture_persistence(): void
+    public function testBfdFixturePersistence(): void
     {
         $fixtureDir = __DIR__ . '/../Fixtures/BFD';
         if (!is_dir($fixtureDir)) {

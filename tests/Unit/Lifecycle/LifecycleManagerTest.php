@@ -126,7 +126,7 @@ class LifecycleManagerTest extends TestCase
 
         $handler = new LifecycleHandler(
             id: 'test-handler',
-            callable: function(LifecycleEvent $event, LifecycleContext $context) use (&$calls) {
+            callable: function (LifecycleEvent $event, LifecycleContext $context) use (&$calls) {
                 $calls[] = [
                     'event' => $event->name,
                     'entityId' => $context->entityId,
@@ -156,7 +156,7 @@ class LifecycleManagerTest extends TestCase
 
         $handler1 = new LifecycleHandler(
             id: 'low-priority',
-            callable: function() use (&$executionOrder) {
+            callable: function () use (&$executionOrder) {
                 $executionOrder[] = 'low';
             },
             supportedEvents: ['beforeCreate'],
@@ -165,7 +165,7 @@ class LifecycleManagerTest extends TestCase
 
         $handler2 = new LifecycleHandler(
             id: 'high-priority',
-            callable: function() use (&$executionOrder) {
+            callable: function () use (&$executionOrder) {
                 $executionOrder[] = 'high';
             },
             supportedEvents: ['beforeCreate'],
@@ -174,7 +174,7 @@ class LifecycleManagerTest extends TestCase
 
         $handler3 = new LifecycleHandler(
             id: 'medium-priority',
-            callable: function() use (&$executionOrder) {
+            callable: function () use (&$executionOrder) {
                 $executionOrder[] = 'medium';
             },
             supportedEvents: ['beforeCreate'],
@@ -202,7 +202,7 @@ class LifecycleManagerTest extends TestCase
 
         $handler1 = new LifecycleHandler(
             id: 'enabled-handler',
-            callable: function() use (&$calls) {
+            callable: function () use (&$calls) {
                 $calls[] = 'enabled';
             },
             supportedEvents: ['beforeCreate'],
@@ -211,7 +211,7 @@ class LifecycleManagerTest extends TestCase
 
         $handler2 = new LifecycleHandler(
             id: 'disabled-handler',
-            callable: function() use (&$calls) {
+            callable: function () use (&$calls) {
                 $calls[] = 'disabled';
             },
             supportedEvents: ['beforeCreate'],
@@ -239,7 +239,7 @@ class LifecycleManagerTest extends TestCase
 
         $handler = new LifecycleHandler(
             id: 'multi-handler',
-            callable: function(LifecycleEvent $event) use (&$calls) {
+            callable: function (LifecycleEvent $event) use (&$calls) {
                 $calls[] = $event->name;
             },
             supportedEvents: ['beforeCreate', 'afterCreate', 'beforeUpdate']
@@ -267,7 +267,7 @@ class LifecycleManagerTest extends TestCase
 
         $handler = new LifecycleHandler(
             id: 'context-handler',
-            callable: function(LifecycleEvent $event, LifecycleContext $context) use (&$receivedContext) {
+            callable: function (LifecycleEvent $event, LifecycleContext $context) use (&$receivedContext) {
                 $receivedContext = $context;
             },
             supportedEvents: ['beforeCreate']
@@ -480,7 +480,7 @@ class LifecycleManagerTest extends TestCase
     {
         $handler = new LifecycleHandler(
             id: 'failing-handler',
-            callable: function() {
+            callable: function () {
                 throw new \RuntimeException('Handler failed');
             },
             supportedEvents: ['beforeCreate']
@@ -624,7 +624,7 @@ class LifecycleManagerTest extends TestCase
 
         $handler = new LifecycleHandler(
             id: 'handler-1',
-            callable: function(LifecycleEvent $event) use (&$receivedEvent) {
+            callable: function (LifecycleEvent $event) use (&$receivedEvent) {
                 $receivedEvent = $event;
             },
             supportedEvents: ['beforeCreate']

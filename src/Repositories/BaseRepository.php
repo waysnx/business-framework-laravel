@@ -233,7 +233,7 @@ class BaseRepository implements RepositoryInterface
 
     /**
      * Get the current authenticated user ID for audit trails
-     * 
+     *
      * Override in application-specific repositories to integrate with auth system
      *
      * @return string|int|null The current user ID

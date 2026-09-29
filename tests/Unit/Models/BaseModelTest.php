@@ -11,16 +11,7 @@ use WaysNX\BusinessFramework\Contracts\EntityInterface;
 use WaysNX\BusinessFramework\Contracts\AuditableInterface;
 use WaysNX\BusinessFramework\Contracts\MetadataInterface;
 
-/**
- * ConcreteTestModel
- *
- * Concrete implementation of BaseModel for testing.
- */
-class ConcreteTestModel extends BaseModel
-{
-    // BaseModel is now concrete and can be instantiated directly
-    // in Laravel implementation
-}
+require_once __DIR__ . '/ConcreteTestModel.php';
 
 /**
  * BaseModelTest

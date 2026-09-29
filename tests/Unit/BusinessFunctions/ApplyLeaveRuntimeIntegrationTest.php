@@ -36,7 +36,7 @@ class ApplyLeaveRuntimeIntegrationTest extends TestCase
      * Validates that Runtime's execute() method successfully coordinates
      * all six pipeline phases with real ApplyLeave.
      */
-    public function test_runtime_orchestrates_complete_pipeline(): void
+    public function testRuntimeOrchestratesCompletePipeline(): void
     {
         $request = [
             'employeeId' => 'EMP-2026-001',
@@ -73,7 +73,7 @@ class ApplyLeaveRuntimeIntegrationTest extends TestCase
      *
      * Validates that Runtime correctly propagates validation errors.
      */
-    public function test_runtime_handles_validation_failure(): void
+    public function testRuntimeHandlesValidationFailure(): void
     {
         $request = [
             'employeeId' => 'EMP-2026-001',
@@ -106,7 +106,7 @@ class ApplyLeaveRuntimeIntegrationTest extends TestCase
      *
      * Validates that Runtime correctly propagates authorization errors.
      */
-    public function test_runtime_handles_authorization_failure(): void
+    public function testRuntimeHandlesAuthorizationFailure(): void
     {
         $request = [
             'employeeId' => 'EMP-2026-001',
@@ -137,7 +137,7 @@ class ApplyLeaveRuntimeIntegrationTest extends TestCase
      *
      * Validates that Runtime correctly propagates business rule violations.
      */
-    public function test_runtime_handles_business_rule_failure(): void
+    public function testRuntimeHandlesBusinessRuleFailure(): void
     {
         $request = [
             'employeeId' => 'EMP-2026-003', // Inactive employee
@@ -168,7 +168,7 @@ class ApplyLeaveRuntimeIntegrationTest extends TestCase
      *
      * Validates that Runtime properly observes events published by ApplyLeave.
      */
-    public function test_runtime_collects_events_after_success(): void
+    public function testRuntimeCollectsEventsAfterSuccess(): void
     {
         $request = [
             'employeeId' => 'EMP-2026-002',
@@ -195,7 +195,7 @@ class ApplyLeaveRuntimeIntegrationTest extends TestCase
      *
      * Validates that Runtime only collects events after successful execution.
      */
-    public function test_runtime_does_not_collect_events_on_failure(): void
+    public function testRuntimeDoesNotCollectEventsOnFailure(): void
     {
         $request = [
             'employeeId' => 'EMP-2026-001',
@@ -225,7 +225,7 @@ class ApplyLeaveRuntimeIntegrationTest extends TestCase
      *
      * Validates that Runtime properly tracks execution metrics.
      */
-    public function test_runtime_captures_execution_metrics(): void
+    public function testRuntimeCapturesExecutionMetrics(): void
     {
         $request = [
             'employeeId' => 'EMP-2026-004',
@@ -261,7 +261,7 @@ class ApplyLeaveRuntimeIntegrationTest extends TestCase
      * Validates that Runtime can handle multiple sequential calls
      * without state pollution.
      */
-    public function test_multiple_sequential_executions(): void
+    public function testMultipleSequentialExecutions(): void
     {
         // First execution
         $request1 = [
@@ -306,7 +306,7 @@ class ApplyLeaveRuntimeIntegrationTest extends TestCase
      * Validates that Runtime properly passes caller context through
      * the authorization phase.
      */
-    public function test_runtime_works_with_different_caller_roles(): void
+    public function testRuntimeWorksWithDifferentCallerRoles(): void
     {
         $request = [
             'employeeId' => 'EMP-2026-001',
@@ -339,7 +339,7 @@ class ApplyLeaveRuntimeIntegrationTest extends TestCase
      * Validates that the response passed through Runtime matches
      * the ApplyLeave response contract.
      */
-    public function test_runtime_preserves_response_contract(): void
+    public function testRuntimePreservesResponseContract(): void
     {
         $request = [
             'employeeId' => 'EMP-2026-004',

@@ -10,6 +10,7 @@ use WaysNX\BusinessFramework\Exceptions\WorkflowNotFoundException;
 use WaysNX\BusinessFramework\Registry\WorkflowDefinition;
 use WaysNX\BusinessFramework\Registry\WorkflowRegistry;
 use WaysNX\BusinessFramework\Registry\WorkflowStep;
+use WaysNX\BusinessFramework\Tests\Unit\Registry\TestWorkflowRegistry;
 
 /**
  * WorkflowRegistryTest
@@ -671,104 +672,5 @@ class WorkflowRegistryTest extends TestCase
 
         $this->assertCount(2, $found->steps);
         $this->assertSame('step-1', $found->steps[0]->id);
-    }
-}
-
-/**
- * TestWorkflowRegistry
- *
- * Test implementation that tracks hook calls.
- *
-
- * @package WaysNX\BusinessFramework\Tests\Registry
- */
-class TestWorkflowRegistry extends WorkflowRegistry
-{
-    /**
-     * Track if beforeRegister was called
-     *
-
-     * @var bool
-     */
-    public bool $beforeRegisterCalled = false;
-
-    /**
-     * Track if afterRegister was called
-     *
-
-     * @var bool
-     */
-    public bool $afterRegisterCalled = false;
-
-    /**
-     * Track if beforeUnregister was called
-     *
-
-     * @var bool
-     */
-    public bool $beforeUnregisterCalled = false;
-
-    /**
-     * Track if afterUnregister was called
-     *
-
-     * @var bool
-     */
-    public bool $afterUnregisterCalled = false;
-
-    /**
-     * Override beforeRegister to track calls
-     *
-
-     * @param WorkflowDefinition $definition The workflow definition
-     *
-
-     * @return void
-     */
-    protected function beforeRegister(WorkflowDefinition $definition): void
-    {
-        $this->beforeRegisterCalled = true;
-    }
-
-    /**
-     * Override afterRegister to track calls
-     *
-
-     * @param WorkflowDefinition $definition The workflow definition
-     *
-
-     * @return void
-     */
-    protected function afterRegister(WorkflowDefinition $definition): void
-    {
-        $this->afterRegisterCalled = true;
-    }
-
-    /**
-     * Override beforeUnregister to track calls
-     *
-
-     * @param WorkflowDefinition $definition The workflow definition
-     *
-
-     * @return void
-     */
-    protected function beforeUnregister(WorkflowDefinition $definition): void
-    {
-        $this->beforeUnregisterCalled = true;
-    }
-
-    /**
-     * Override afterUnregister to track calls
-     *
-
-     * @param WorkflowDefinition $definition The workflow definition
-     *
-
-     * @return void
-     */
-    protected function afterUnregister(WorkflowDefinition $definition): void
-    {
-        $this->afterUnregisterCalled = true;
     }
 }

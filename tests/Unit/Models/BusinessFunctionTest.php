@@ -10,41 +10,7 @@ use WaysNX\BusinessFramework\Contracts\BusinessFunctionInterface;
 use WaysNX\BusinessFramework\Core\BusinessFunctionAbstract;
 use JsonSerializable;
 
-/**
- * Concrete test implementation of BusinessFunction
- *
- * Used to test the BusinessFunction class.
- */
-class ConcreteBusinessFunction extends BusinessFunction
-{
-    protected function generateUuid(): string
-    {
-        // Use Ramsey\Uuid in real implementation
-        return 'laravel-uuid-' . uniqid();
-    }
-
-    protected function initializeAuditTimestamps(): void
-    {
-        $this->createdAt = new \DateTimeImmutable('2026-08-15 12:00:00');
-        $this->updatedAt = null;
-        $this->deletedAt = null;
-    }
-
-    protected function updateTimestamp(): void
-    {
-        $this->updatedAt = new \DateTimeImmutable('now');
-    }
-
-    protected function deleteTimestamp(): void
-    {
-        $this->deletedAt = new \DateTimeImmutable('now');
-    }
-
-    protected function executeBusiness(array $request): array
-    {
-        return ['status' => 'success', 'result' => $request];
-    }
-}
+require_once __DIR__ . '/ConcreteBusinessFunction.php';
 
 /**
  * BusinessFunctionTest
@@ -153,7 +119,7 @@ class BusinessFunctionTest extends TestCase
      *
      * @test
      */
-    public function test_business_function_extends_abstract(): void
+    public function testBusinessFunctionExtendsAbstract(): void
     {
         $func = $this->createTestFunction();
         $this->assertInstanceOf(BusinessFunctionAbstract::class, $func);
@@ -164,7 +130,7 @@ class BusinessFunctionTest extends TestCase
      *
      * @test
      */
-    public function test_business_function_implements_interface(): void
+    public function testBusinessFunctionImplementsInterface(): void
     {
         $func = $this->createTestFunction();
         $this->assertInstanceOf(\WaysNX\BusinessFramework\Types\BusinessFunctionInterface::class, $func);
@@ -175,7 +141,7 @@ class BusinessFunctionTest extends TestCase
      *
      * @test
      */
-    public function test_business_function_implements_laravel_contract(): void
+    public function testBusinessFunctionImplementsLaravelContract(): void
     {
         $func = $this->createTestFunction();
         $this->assertInstanceOf(BusinessFunctionInterface::class, $func);
@@ -186,7 +152,7 @@ class BusinessFunctionTest extends TestCase
      *
      * @test
      */
-    public function test_business_function_implements_json_serializable(): void
+    public function testBusinessFunctionImplementsJsonSerializable(): void
     {
         $func = $this->createTestFunction();
         $this->assertInstanceOf(JsonSerializable::class, $func);
@@ -201,7 +167,7 @@ class BusinessFunctionTest extends TestCase
      *
      * @test
      */
-    public function test_function_id_is_accessible(): void
+    public function testFunctionIdIsAccessible(): void
     {
         $func = $this->createTestFunction();
         $this->assertEquals('HR.LEAVE.APPLY.APPLY_LEAVE', $func->getFunctionId());
@@ -212,7 +178,7 @@ class BusinessFunctionTest extends TestCase
      *
      * @test
      */
-    public function test_function_name_is_accessible(): void
+    public function testFunctionNameIsAccessible(): void
     {
         $func = $this->createTestFunction();
         $this->assertEquals('Apply Leave', $func->getFunctionName());
@@ -223,7 +189,7 @@ class BusinessFunctionTest extends TestCase
      *
      * @test
      */
-    public function test_function_version_is_accessible(): void
+    public function testFunctionVersionIsAccessible(): void
     {
         $func = $this->createTestFunction();
         $this->assertEquals('1.0.0', $func->getFunctionVersion());
@@ -234,7 +200,7 @@ class BusinessFunctionTest extends TestCase
      *
      * @test
      */
-    public function test_module_domain_capability_are_accessible(): void
+    public function testModuleDomainCapabilityAreAccessible(): void
     {
         $func = $this->createTestFunction();
         $this->assertEquals('HR', $func->getModule());
@@ -247,7 +213,7 @@ class BusinessFunctionTest extends TestCase
      *
      * @test
      */
-    public function test_lifecycle_status_is_accessible(): void
+    public function testLifecycleStatusIsAccessible(): void
     {
         $func = $this->createTestFunction();
         $this->assertEquals('Released', $func->getLifecycleStatus());
@@ -262,7 +228,7 @@ class BusinessFunctionTest extends TestCase
      *
      * @test
      */
-    public function test_metadata_is_accessible(): void
+    public function testMetadataIsAccessible(): void
     {
         $func = $this->createTestFunction();
 
@@ -278,7 +244,7 @@ class BusinessFunctionTest extends TestCase
      *
      * @test
      */
-    public function test_tags_are_accessible(): void
+    public function testTagsAreAccessible(): void
     {
         $func = $this->createTestFunction();
         $tags = $func->getTags();
@@ -292,7 +258,7 @@ class BusinessFunctionTest extends TestCase
      *
      * @test
      */
-    public function test_events_are_accessible(): void
+    public function testEventsAreAccessible(): void
     {
         $func = $this->createTestFunction();
 
@@ -309,7 +275,7 @@ class BusinessFunctionTest extends TestCase
      *
      * @test
      */
-    public function test_request_contract_is_accessible(): void
+    public function testRequestContractIsAccessible(): void
     {
         $func = $this->createTestFunction();
         $request = $func->getRequestContract();
@@ -324,7 +290,7 @@ class BusinessFunctionTest extends TestCase
      *
      * @test
      */
-    public function test_response_contract_is_accessible(): void
+    public function testResponseContractIsAccessible(): void
     {
         $func = $this->createTestFunction();
         $response = $func->getResponseContract();
@@ -338,7 +304,7 @@ class BusinessFunctionTest extends TestCase
      *
      * @test
      */
-    public function test_error_categories_are_accessible(): void
+    public function testErrorCategoriesAreAccessible(): void
     {
         $func = $this->createTestFunction();
         $errors = $func->getErrorCategories();
@@ -356,7 +322,7 @@ class BusinessFunctionTest extends TestCase
      *
      * @test
      */
-    public function test_validation_rules_are_accessible(): void
+    public function testValidationRulesAreAccessible(): void
     {
         $func = $this->createTestFunction();
         $rules = $func->getValidationRules();
@@ -370,7 +336,7 @@ class BusinessFunctionTest extends TestCase
      *
      * @test
      */
-    public function test_authorization_requirements_are_accessible(): void
+    public function testAuthorizationRequirementsAreAccessible(): void
     {
         $func = $this->createTestFunction();
         $auth = $func->getAuthorizationRequirements();
@@ -384,7 +350,7 @@ class BusinessFunctionTest extends TestCase
      *
      * @test
      */
-    public function test_business_rules_are_accessible(): void
+    public function testBusinessRulesAreAccessible(): void
     {
         $func = $this->createTestFunction();
         $rules = $func->getBusinessRules();
@@ -402,7 +368,7 @@ class BusinessFunctionTest extends TestCase
      *
      * @test
      */
-    public function test_business_function_can_serialize_to_array(): void
+    public function testBusinessFunctionCanSerializeToArray(): void
     {
         $func = $this->createTestFunction();
         $array = $func->toArray();
@@ -419,7 +385,7 @@ class BusinessFunctionTest extends TestCase
      *
      * @test
      */
-    public function test_business_function_can_serialize_to_json(): void
+    public function testBusinessFunctionCanSerializeToJson(): void
     {
         $func = $this->createTestFunction();
         $json = $func->toJson();
@@ -437,7 +403,7 @@ class BusinessFunctionTest extends TestCase
      *
      * @test
      */
-    public function test_business_function_json_serialize_works(): void
+    public function testBusinessFunctionJsonSerializeWorks(): void
     {
         $func = $this->createTestFunction();
         $serialized = $func->jsonSerialize();
@@ -459,7 +425,7 @@ class BusinessFunctionTest extends TestCase
      *
      * @test
      */
-    public function test_business_function_has_entity_id(): void
+    public function testBusinessFunctionHasEntityId(): void
     {
         $func = $this->createTestFunction();
         $entityId = $func->getEntityId();
@@ -473,7 +439,7 @@ class BusinessFunctionTest extends TestCase
      *
      * @test
      */
-    public function test_business_function_has_entity_type(): void
+    public function testBusinessFunctionHasEntityType(): void
     {
         $func = $this->createTestFunction();
         $entityType = $func->getEntityType();
@@ -487,7 +453,7 @@ class BusinessFunctionTest extends TestCase
      *
      * @test
      */
-    public function test_business_function_has_versioning(): void
+    public function testBusinessFunctionHasVersioning(): void
     {
         $func = $this->createTestFunction();
         $version = $func->getEntityVersion();
@@ -501,7 +467,7 @@ class BusinessFunctionTest extends TestCase
      *
      * @test
      */
-    public function test_business_function_has_audit_timestamps(): void
+    public function testBusinessFunctionHasAuditTimestamps(): void
     {
         $func = $this->createTestFunction();
 
@@ -519,7 +485,7 @@ class BusinessFunctionTest extends TestCase
      *
      * @test
      */
-    public function test_business_function_has_string_representation(): void
+    public function testBusinessFunctionHasStringRepresentation(): void
     {
         $func = $this->createTestFunction();
         $string = (string)$func;
@@ -540,7 +506,7 @@ class BusinessFunctionTest extends TestCase
      *
      * @test
      */
-    public function test_complete_contract_definition_is_comprehensive(): void
+    public function testCompleteContractDefinitionIsComprehensive(): void
     {
         $func = $this->createTestFunction();
         $definition = $func->getCompleteContractDefinition();

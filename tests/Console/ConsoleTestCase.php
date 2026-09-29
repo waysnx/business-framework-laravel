@@ -50,7 +50,8 @@ class ConsoleTestCase extends TestCase
 
         // Create real Laravel container (extends it with test support)
         $this->container = new class extends Container {
-            public function runningUnitTests() {
+            public function runningUnitTests()
+            {
                 return true;
             }
         };
@@ -59,7 +60,7 @@ class ConsoleTestCase extends TestCase
         Container::setInstance($this->container);
 
         // Bootstrap config BEFORE registering provider (so provider's mergeConfigFrom finds it)
-        $this->container->singleton('config', function() {
+        $this->container->singleton('config', function () {
             return new class {
                 private $data = [
                     'app' => [
@@ -79,7 +80,8 @@ class ConsoleTestCase extends TestCase
                     ],
                 ];
 
-                public function get($key, $default = null) {
+                public function get($key, $default = null)
+                {
                     $keys = explode('.', $key);
                     $value = $this->data;
                     foreach ($keys as $k) {
@@ -92,15 +94,18 @@ class ConsoleTestCase extends TestCase
                     return $value;
                 }
 
-                public function has($key) {
+                public function has($key)
+                {
                     return $this->get($key) !== null;
                 }
 
-                public function all() {
+                public function all()
+                {
                     return $this->data;
                 }
 
-                public function set($key, $value) {
+                public function set($key, $value)
+                {
                     $keys = explode('.', $key);
                     $current = &$this->data;
                     foreach ($keys as $k) {
@@ -112,7 +117,8 @@ class ConsoleTestCase extends TestCase
                     $current = $value;
                 }
 
-                public function merge($key, $data) {
+                public function merge($key, $data)
+                {
                     // Support config merge from provider
                     if (isset($this->data[$key])) {
                         $this->data[$key] = array_merge($this->data[$key], $data);
@@ -134,7 +140,7 @@ class ConsoleTestCase extends TestCase
 
         // Create Artisan console with real container
         $this->artisan = new Artisan($this->container, $this->container['events'], 'test');
-        
+
         // Add commands
         $this->artisan->add($this->container->make(\WaysNX\BusinessFramework\Console\Commands\MakeCommand::class));
         $this->artisan->add($this->container->make(\WaysNX\BusinessFramework\Console\Commands\ListCommand::class));

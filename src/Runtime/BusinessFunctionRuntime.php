@@ -83,8 +83,20 @@ class BusinessFunctionRuntime
         }
     }
 
-    public function getContext(): array { return $this->context; }
-    public function getEvents(): array { return $this->events; }
-    public function getExecutionError(): ?\Throwable { return $this->executionError; }
-    public function wasSuccessful(): bool { return $this->executionError === null; }
+    public function getContext(): array
+    {
+        return $this->context;
+    }
+    public function getEvents(): array
+    {
+        return $this->events;
+    }
+    public function getExecutionError(): ?\Throwable
+    {
+        return $this->executionError;
+    }
+    public function wasSuccessful(): bool
+    {
+        return $this->executionError === null;
+    }
 }

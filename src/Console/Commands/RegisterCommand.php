@@ -125,7 +125,7 @@ class RegisterCommand extends BaseWbfCommand
                     // With --fail-if-not-found: return error
                     $exitCode = self::EXIT_NOT_FOUND;
                     $message = "Resource not found: {$type}/{$id}";
-                    
+
                     if ($this->jsonOutput) {
                         return $this->outputJsonError(
                             $message,
@@ -259,6 +259,4 @@ class RegisterCommand extends BaseWbfCommand
             return false;
         }
     }
-
-
 }

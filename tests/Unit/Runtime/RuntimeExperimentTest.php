@@ -38,7 +38,7 @@ class RuntimeExperimentTest extends TestCase
     /**
      * Test 1: Successful execution returns response
      */
-    public function test_successful_execution_returns_response(): void
+    public function testSuccessfulExecutionReturnsResponse(): void
     {
         $bf = $this->createTestBusinessFunction();
 
@@ -51,7 +51,7 @@ class RuntimeExperimentTest extends TestCase
     /**
      * Test 2: Validation failure throws and marks context as failed
      */
-    public function test_validation_failure_throws_and_sets_context(): void
+    public function testValidationFailureThrowsAndSetsContext(): void
     {
         $bf = $this->createBusinessFunctionThatFailsValidation();
 
@@ -66,7 +66,7 @@ class RuntimeExperimentTest extends TestCase
     /**
      * Test 3: Authorization runs after validation succeeds
      */
-    public function test_authorization_runs_after_validation(): void
+    public function testAuthorizationRunsAfterValidation(): void
     {
         $bf = $this->createBusinessFunctionThatFailsAuthorization();
 
@@ -81,7 +81,7 @@ class RuntimeExperimentTest extends TestCase
     /**
      * Test 4: Business rules run after authorization succeeds
      */
-    public function test_business_rules_run_after_authorization(): void
+    public function testBusinessRulesRunAfterAuthorization(): void
     {
         $bf = $this->createBusinessFunctionThatFailsBusinessRules();
 
@@ -96,7 +96,7 @@ class RuntimeExperimentTest extends TestCase
     /**
      * Test 5: Execution runs after all validation phases pass
      */
-    public function test_execution_runs_after_all_phases_pass(): void
+    public function testExecutionRunsAfterAllPhasesPass(): void
     {
         $bf = $this->createTestBusinessFunction();
 
@@ -110,7 +110,7 @@ class RuntimeExperimentTest extends TestCase
     /**
      * Test 6: Events collected after successful execution
      */
-    public function test_events_collected_after_execution(): void
+    public function testEventsCollectedAfterExecution(): void
     {
         $bf = $this->createTestBusinessFunction();
 
@@ -124,7 +124,7 @@ class RuntimeExperimentTest extends TestCase
     /**
      * Test 7: Events NOT collected on failure
      */
-    public function test_events_not_collected_on_failure(): void
+    public function testEventsNotCollectedOnFailure(): void
     {
         $bf = $this->createBusinessFunctionThatFailsValidation();
 
@@ -140,7 +140,7 @@ class RuntimeExperimentTest extends TestCase
     /**
      * Test 8: Observability metrics captured
      */
-    public function test_observability_metrics_captured(): void
+    public function testObservabilityMetricsCaptured(): void
     {
         $bf = $this->createTestBusinessFunction();
 
@@ -156,7 +156,7 @@ class RuntimeExperimentTest extends TestCase
     /**
      * Test 9: Response transformation applied
      */
-    public function test_response_transformation_applied(): void
+    public function testResponseTransformationApplied(): void
     {
         $bf = $this->createBusinessFunctionWithTransformation();
 

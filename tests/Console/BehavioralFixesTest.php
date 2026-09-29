@@ -48,7 +48,7 @@ class BehavioralFixesTest extends TestCase
         $command = new MakeCommand();
         $reflection = new \ReflectionClass($command);
         $signature = $reflection->getProperty('signature')->getValue($command);
-        
+
         // Should have --force option
         $this->assertStringContainsString('--f|force', $signature);
     }
@@ -71,7 +71,7 @@ class BehavioralFixesTest extends TestCase
         $command = new RegisterCommand();
         $reflection = new \ReflectionClass($command);
         $signature = $reflection->getProperty('signature')->getValue($command);
-        
+
         // Should have --fail-if-not-found option
         $this->assertStringContainsString('--fail-if-not-found', $signature);
     }
@@ -93,7 +93,7 @@ class BehavioralFixesTest extends TestCase
         $command = new DoctorCommand();
         $reflection = new \ReflectionClass($command);
         $signature = $reflection->getProperty('signature')->getValue($command);
-        
+
         // Should use --detail, not --verbose (to avoid conflict with global Symfony option)
         $this->assertStringContainsString('--detail', $signature);
         // Should NOT have --verbose (that's a global Symfony option)
@@ -115,9 +115,11 @@ class BehavioralFixesTest extends TestCase
         foreach ($commands as $command) {
             $reflection = new \ReflectionClass($command);
             $signature = $reflection->getProperty('signature')->getValue($command);
-            
+
             // Should NOT have {--no-interaction : ...} in signature
-            $this->assertStringNotContainsString('{--no-interaction', $signature,
+            $this->assertStringNotContainsString(
+                '{--no-interaction',
+                $signature,
                 get_class($command) . " should not define --no-interaction in signature (it's global)"
             );
         }
@@ -129,11 +131,11 @@ class BehavioralFixesTest extends TestCase
     public function testMakeCommandDoesNotHaveGetOptionsMethod(): void
     {
         $command = new MakeCommand();
-        
+
         // Check that MakeCommand doesn't have a custom getOptions() or has already removed it
         // We'll verify options work through signature
         $definition = $command->getDefinition();
-        
+
         $this->assertTrue($definition->hasOption('module'));
         $this->assertTrue($definition->hasOption('force'));
         $this->assertTrue($definition->hasOption('json'));
@@ -157,7 +159,7 @@ class BehavioralFixesTest extends TestCase
     {
         // Check that the command base class has JSON output support
         $reflection = new \ReflectionClass('WaysNX\\BusinessFramework\\Console\\BaseWbfCommand');
-        
+
         $this->assertTrue($reflection->hasMethod('outputJson'));
         $this->assertTrue($reflection->hasMethod('outputJsonError'));
     }
@@ -169,7 +171,7 @@ class BehavioralFixesTest extends TestCase
     {
         $command = new MakeCommand();
         $reflection = new \ReflectionClass($command);
-        
+
         $this->assertTrue($reflection->hasConstant('EXIT_SUCCESS'));
         $this->assertTrue($reflection->hasConstant('EXIT_CONFLICT'));
         $this->assertTrue($reflection->hasConstant('EXIT_NOT_FOUND'));
@@ -181,17 +183,19 @@ class BehavioralFixesTest extends TestCase
     public function testBaseWbfCommandRemovedGetOptions(): void
     {
         $reflection = new \ReflectionClass('WaysNX\\BusinessFramework\\Console\\BaseWbfCommand');
-        
+
         // Check if getOptions is defined in BaseWbfCommand itself
         // (it may inherit from Command but shouldn't redefine it)
         $methods = $reflection->getMethods(\ReflectionMethod::IS_PUBLIC);
-        $methodNames = array_map(function($m) { return $m->getName(); }, $methods);
-        
+        $methodNames = array_map(function ($m) {
+            return $m->getName();
+        }, $methods);
+
         // If getOptions is in the class, it should NOT be from BaseWbfCommand (should be from parent)
         // We can't easily test this without reflection, but we can verify options work through signature
         $command = new MakeCommand();
         $definition = $command->getDefinition();
-        
+
         // Options should be available even without custom getOptions()
         $this->assertTrue($definition->hasOption('json'));
     }
@@ -209,7 +213,8 @@ class BehavioralFixesTest extends TestCase
 
         foreach ($commands as $command) {
             $definition = $command->getDefinition();
-            $this->assertTrue($definition->hasOption('json'),
+            $this->assertTrue(
+                $definition->hasOption('json'),
                 get_class($command) . " should have --json option"
             );
         }
@@ -223,8 +228,9 @@ class BehavioralFixesTest extends TestCase
     {
         // MakeCommand should have a method that checks all conflicting files at once
         $reflection = new \ReflectionClass('WaysNX\\BusinessFramework\\Console\\Commands\\MakeCommand');
-        
-        $this->assertTrue($reflection->hasMethod('getConflictingFiles'),
+
+        $this->assertTrue(
+            $reflection->hasMethod('getConflictingFiles'),
             "MakeCommand should have getConflictingFiles() for atomic --force detection"
         );
     }

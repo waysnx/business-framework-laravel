@@ -9,6 +9,7 @@ use WaysNX\BusinessFramework\Exceptions\DuplicateEntityException;
 use WaysNX\BusinessFramework\Exceptions\EntityNotFoundException;
 use WaysNX\BusinessFramework\Registry\EntityDefinition;
 use WaysNX\BusinessFramework\Registry\EntityRegistry;
+use WaysNX\BusinessFramework\Tests\Unit\Registry\TestEntityRegistry;
 
 /**
  * EntityRegistryTest
@@ -896,7 +897,7 @@ class EntityRegistryTest extends TestCase
      */
     public function testExtensionHooksAreCalled(): void
     {
-        $registry = new TestRegistry();
+        $registry = new TestEntityRegistry();
 
         $definition = new EntityDefinition(
             id: 'project',
@@ -915,103 +916,5 @@ class EntityRegistryTest extends TestCase
 
         $this->assertTrue($registry->beforeUnregisterCalled);
         $this->assertTrue($registry->afterUnregisterCalled);
-    }
-}
-
-/**
- * TestRegistry
- *
- * Test implementation of EntityRegistry that tracks hook calls.
- *
- * @package WaysNX\BusinessFramework\Tests\Registry
- */
-class TestRegistry extends EntityRegistry
-{
-    /**
-     * Track if beforeRegister was called
-     *
-
-     * @var bool
-     */
-    public bool $beforeRegisterCalled = false;
-
-    /**
-     * Track if afterRegister was called
-     *
-
-     * @var bool
-     */
-    public bool $afterRegisterCalled = false;
-
-    /**
-     * Track if beforeUnregister was called
-     *
-
-     * @var bool
-     */
-    public bool $beforeUnregisterCalled = false;
-
-    /**
-     * Track if afterUnregister was called
-     *
-
-     * @var bool
-     */
-    public bool $afterUnregisterCalled = false;
-
-    /**
-     * Override beforeRegister to track calls
-     *
-
-     * @param EntityDefinition $definition The entity definition
-     *
-
-     * @return void
-     */
-    protected function beforeRegister(EntityDefinition $definition): void
-    {
-        $this->beforeRegisterCalled = true;
-    }
-
-    /**
-     * Override afterRegister to track calls
-     *
-
-     * @param EntityDefinition $definition The entity definition
-     *
-
-     * @return void
-     */
-    protected function afterRegister(EntityDefinition $definition): void
-    {
-        $this->afterRegisterCalled = true;
-    }
-
-    /**
-     * Override beforeUnregister to track calls
-     *
-
-     * @param EntityDefinition $definition The entity definition
-     *
-
-     * @return void
-     */
-    protected function beforeUnregister(EntityDefinition $definition): void
-    {
-        $this->beforeUnregisterCalled = true;
-    }
-
-    /**
-     * Override afterUnregister to track calls
-     *
-
-     * @param EntityDefinition $definition The entity definition
-     *
-
-     * @return void
-     */
-    protected function afterUnregister(EntityDefinition $definition): void
-    {
-        $this->afterUnregisterCalled = true;
     }
 }

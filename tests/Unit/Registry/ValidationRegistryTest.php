@@ -10,6 +10,7 @@ use WaysNX\BusinessFramework\Exceptions\ValidationNotFoundException;
 use WaysNX\BusinessFramework\Registry\ValidationDefinition;
 use WaysNX\BusinessFramework\Registry\ValidationRegistry;
 use WaysNX\BusinessFramework\Registry\ValidationRuleDefinition;
+use WaysNX\BusinessFramework\Tests\Unit\Registry\TestValidationRegistry;
 
 /**
  * ValidationRegistryTest
@@ -372,33 +373,5 @@ class ValidationRegistryTest extends TestCase
 
         $this->assertCount(2, $found->rules);
         $this->assertSame('rule-1', $found->rules[0]->id);
-    }
-}
-
-class TestValidationRegistry extends ValidationRegistry
-{
-    public bool $beforeRegisterCalled = false;
-    public bool $afterRegisterCalled = false;
-    public bool $beforeUnregisterCalled = false;
-    public bool $afterUnregisterCalled = false;
-
-    protected function beforeRegister(ValidationDefinition $definition): void
-    {
-        $this->beforeRegisterCalled = true;
-    }
-
-    protected function afterRegister(ValidationDefinition $definition): void
-    {
-        $this->afterRegisterCalled = true;
-    }
-
-    protected function beforeUnregister(ValidationDefinition $definition): void
-    {
-        $this->beforeUnregisterCalled = true;
-    }
-
-    protected function afterUnregister(ValidationDefinition $definition): void
-    {
-        $this->afterUnregisterCalled = true;
     }
 }

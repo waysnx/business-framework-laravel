@@ -37,13 +37,13 @@ abstract class BaseWbfCommand extends Command
     /**
      * Exit code constants
      */
-    const EXIT_SUCCESS = 0;
-    const EXIT_ERROR = 1;
-    const EXIT_INVALID_ARGUMENT = 2;
-    const EXIT_NOT_FOUND = 3;
-    const EXIT_PERMISSION_DENIED = 4;
-    const EXIT_CONFLICT = 5;
-    const EXIT_SYSTEM_FAILURE = 6;
+    public const EXIT_SUCCESS = 0;
+    public const EXIT_ERROR = 1;
+    public const EXIT_INVALID_ARGUMENT = 2;
+    public const EXIT_NOT_FOUND = 3;
+    public const EXIT_PERMISSION_DENIED = 4;
+    public const EXIT_CONFLICT = 5;
+    public const EXIT_SYSTEM_FAILURE = 6;
 
     /**
      * Whether to output as JSON
@@ -106,8 +106,12 @@ abstract class BaseWbfCommand extends Command
      * @param array $details Additional error details
      * @return int Exit code
      */
-    protected function errorOutput(string $message, int $code = self::EXIT_ERROR, string $type = 'error', array $details = []): int
-    {
+    protected function errorOutput(
+        string $message,
+        int $code = self::EXIT_ERROR,
+        string $type = 'error',
+        array $details = []
+    ): int {
         if ($this->jsonOutput) {
             return $this->outputJsonError($message, $code, $type, $details);
         }
@@ -166,8 +170,12 @@ abstract class BaseWbfCommand extends Command
      * @param array $details Error details
      * @return int Exit code
      */
-    protected function outputJsonError(string $message, int $code = self::EXIT_ERROR, string $type = 'error', array $details = []): int
-    {
+    protected function outputJsonError(
+        string $message,
+        int $code = self::EXIT_ERROR,
+        string $type = 'error',
+        array $details = []
+    ): int {
         $response = [
             'status' => 'error',
             'code' => $code,

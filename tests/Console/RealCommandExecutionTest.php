@@ -36,9 +36,9 @@ class RealCommandExecutionTest extends ConsoleTestCase
     {
         $input = new StringInput($commandLine);
         $output = new BufferedOutput();
-        
+
         $exitCode = $this->artisan->run($input, $output);
-        
+
         return [
             'exitCode' => $exitCode,
             'output' => $output->fetch(),
@@ -55,7 +55,7 @@ class RealCommandExecutionTest extends ConsoleTestCase
 
         // Should show json option
         $this->assertStringContainsString('--json', $helpText);
-        
+
         // Should show list-specific options
         $this->assertStringContainsString('--detailed', $helpText);
         $this->assertStringContainsString('--filter', $helpText);
@@ -72,7 +72,7 @@ class RealCommandExecutionTest extends ConsoleTestCase
 
         // Should show json option
         $this->assertStringContainsString('--json', $helpText);
-        
+
         // Should show make-specific options
         $this->assertStringContainsString('--module', $helpText);
         $this->assertStringContainsString('--domain', $helpText);
@@ -92,7 +92,7 @@ class RealCommandExecutionTest extends ConsoleTestCase
 
         // Should show json option
         $this->assertStringContainsString('--json', $helpText);
-        
+
         // Should show doctor-specific options
         $this->assertStringContainsString('--detail', $helpText);
         $this->assertStringContainsString('--component', $helpText);
@@ -108,7 +108,7 @@ class RealCommandExecutionTest extends ConsoleTestCase
 
         // Should show json option
         $this->assertStringContainsString('--json', $helpText);
-        
+
         // Should show register-specific options
         $this->assertStringContainsString('--fail-if-not-found', $helpText);
     }
@@ -131,7 +131,7 @@ class RealCommandExecutionTest extends ConsoleTestCase
     public function testListCommandRealExecution(): void
     {
         $result = $this->executeCommand('wbf:list');
-        
+
         $this->assertIsInt($result['exitCode']);
         $this->assertNotEmpty($result['output']);
     }
@@ -142,7 +142,7 @@ class RealCommandExecutionTest extends ConsoleTestCase
     public function testListJsonProducesValidJson(): void
     {
         $result = $this->executeCommand('wbf:list --json');
-        
+
         $json = json_decode($result['output'], true);
         $this->assertIsArray($json);
         $this->assertArrayHasKey('status', $json);
@@ -155,7 +155,7 @@ class RealCommandExecutionTest extends ConsoleTestCase
     public function testDoctorCommandRealExecution(): void
     {
         $result = $this->executeCommand('wbf:doctor');
-        
+
         $this->assertIsInt($result['exitCode']);
         $this->assertNotEmpty($result['output']);
     }
@@ -166,7 +166,7 @@ class RealCommandExecutionTest extends ConsoleTestCase
     public function testDoctorJsonProducesValidJson(): void
     {
         $result = $this->executeCommand('wbf:doctor --json');
-        
+
         $json = json_decode($result['output'], true);
         $this->assertIsArray($json);
         $this->assertArrayHasKey('status', $json);
@@ -179,7 +179,7 @@ class RealCommandExecutionTest extends ConsoleTestCase
     {
         // Execute a command that will fail (invalid type)
         $result = $this->executeCommand('wbf:show invalid-type invalid-id --json');
-        
+
         $json = json_decode($result['output'], true);
         $this->assertIsArray($json);
 
@@ -212,7 +212,7 @@ class RealCommandExecutionTest extends ConsoleTestCase
     public function testRegisterNotFoundWithoutFailFlagReturnsSuccess(): void
     {
         $result = $this->executeCommand('wbf:register workflow non-existent-workflow');
-        
+
         // Should return success exit code (0)
         $this->assertEquals(0, $result['exitCode']);
     }
@@ -223,7 +223,7 @@ class RealCommandExecutionTest extends ConsoleTestCase
     public function testRegisterNotFoundWithFailFlagReturnsErrorCode(): void
     {
         $result = $this->executeCommand('wbf:register workflow non-existent-workflow --fail-if-not-found');
-        
+
         // Should return not found exit code (3)
         $this->assertEquals(3, $result['exitCode']);
     }
@@ -234,10 +234,10 @@ class RealCommandExecutionTest extends ConsoleTestCase
     public function testRegisterNotFoundWithFailFlagJsonReturnsErrorStatus(): void
     {
         $result = $this->executeCommand('wbf:register workflow non-existent-workflow --fail-if-not-found --json');
-        
+
         $json = json_decode($result['output'], true);
         $this->assertIsArray($json);
-        
+
         // Should return error status
         $this->assertEquals('error', $json['status']);
         $this->assertEquals(3, $json['code']);
@@ -250,11 +250,11 @@ class RealCommandExecutionTest extends ConsoleTestCase
     public function testDoctorExecutesThroughRealContainer(): void
     {
         $result = $this->executeCommand('wbf:doctor');
-        
+
         // Should complete without errors
         $this->assertIsInt($result['exitCode']);
         $this->assertNotEmpty($result['output']);
-        
+
         // Should show some output (not empty)
         $this->assertGreaterThan(0, strlen($result['output']));
     }

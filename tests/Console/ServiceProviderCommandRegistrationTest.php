@@ -49,7 +49,8 @@ class ServiceProviderCommandRegistrationTest extends TestCase
 
         // Create real Laravel container
         $this->container = new class extends Container {
-            public function runningUnitTests() {
+            public function runningUnitTests()
+            {
                 return true;
             }
         };
@@ -171,13 +172,13 @@ class ServiceProviderCommandRegistrationTest extends TestCase
     public function testCreateDemoCommandHasCorrectSignature(): void
     {
         $command = $this->container->make(\WaysNX\BusinessFramework\Console\Commands\CreateDemoCommand::class);
-        
+
         // Use reflection to access the signature property
         $reflection = new \ReflectionClass($command);
         $property = $reflection->getProperty('signature');
         $property->setAccessible(true);
         $signature = $property->getValue($command);
-        
+
         $this->assertStringContainsString('wbf:createdemo', $signature, 'Command signature should contain wbf:createdemo');
         $this->assertStringContainsString('--json', $signature, 'Command should support --json option');
     }
@@ -243,7 +244,7 @@ class ServiceProviderCommandRegistrationTest extends TestCase
     {
         $providerPath = dirname(__DIR__, 2) . '/src/ServiceProvider/LaravelServiceProvider.php';
         $source = file_get_contents($providerPath);
-        
+
         $this->assertStringContainsString(
             'CreateDemoCommand::class',
             $source,
@@ -262,4 +263,3 @@ class ServiceProviderCommandRegistrationTest extends TestCase
         parent::tearDown();
     }
 }
-

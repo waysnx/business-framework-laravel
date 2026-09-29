@@ -83,7 +83,7 @@ class ValidationFrameworkTest extends TestCase
         );
 
         // Create a framework that passes all rules
-        $framework = new class($this->registry, $this->lifecycleManager) extends ValidationFramework {
+        $framework = new class ($this->registry, $this->lifecycleManager) extends ValidationFramework {
             protected function evaluateRule($rule, $context): bool
             {
                 return true; // All rules pass
@@ -129,7 +129,7 @@ class ValidationFrameworkTest extends TestCase
         $context = new ValidationContext();
 
         // Create framework that fails rules
-        $framework = new class($this->registry, $this->lifecycleManager) extends ValidationFramework {
+        $framework = new class ($this->registry, $this->lifecycleManager) extends ValidationFramework {
             protected function evaluateRule($rule, $context): bool
             {
                 return false; // All rules fail
@@ -193,7 +193,7 @@ class ValidationFrameworkTest extends TestCase
         // Track rule execution
         $executedRules = [];
 
-        $framework = new class($this->registry, $this->lifecycleManager, $executedRules) extends ValidationFramework {
+        $framework = new class ($this->registry, $this->lifecycleManager, $executedRules) extends ValidationFramework {
             public function __construct($registry, $lm, &$executed)
             {
                 parent::__construct($registry, $lm);
@@ -209,7 +209,7 @@ class ValidationFrameworkTest extends TestCase
             private $executed;
         };
 
-        $framework = new class($this->registry, $this->lifecycleManager) extends ValidationFramework {
+        $framework = new class ($this->registry, $this->lifecycleManager) extends ValidationFramework {
             public $executedRules = [];
 
             protected function evaluateRule($rule, $context): bool
@@ -274,7 +274,7 @@ class ValidationFrameworkTest extends TestCase
             options: ['stopOnError' => true]
         );
 
-        $framework = new class($this->registry, $this->lifecycleManager) extends ValidationFramework {
+        $framework = new class ($this->registry, $this->lifecycleManager) extends ValidationFramework {
             protected function evaluateRule($rule, $context): bool
             {
                 return false; // All fail
@@ -326,7 +326,7 @@ class ValidationFrameworkTest extends TestCase
             options: ['stopOnError' => false]
         );
 
-        $framework = new class($this->registry, $this->lifecycleManager) extends ValidationFramework {
+        $framework = new class ($this->registry, $this->lifecycleManager) extends ValidationFramework {
             protected function evaluateRule($rule, $context): bool
             {
                 return false; // All fail
@@ -364,7 +364,7 @@ class ValidationFrameworkTest extends TestCase
 
         $receivedContext = null;
 
-        $framework = new class($this->registry, $this->lifecycleManager) extends ValidationFramework {
+        $framework = new class ($this->registry, $this->lifecycleManager) extends ValidationFramework {
             public $receivedContext = null;
 
             protected function evaluateRule($rule, $context): bool
@@ -422,7 +422,7 @@ class ValidationFrameworkTest extends TestCase
         $this->lifecycleManager->register(
             new \WaysNX\BusinessFramework\Lifecycle\LifecycleHandler(
                 id: 'before-handler',
-                callable: function() use (&$events) {
+                callable: function () use (&$events) {
                     $events[] = 'beforeValidation';
                 },
                 supportedEvents: ['beforeValidation']
@@ -432,7 +432,7 @@ class ValidationFrameworkTest extends TestCase
         $this->lifecycleManager->register(
             new \WaysNX\BusinessFramework\Lifecycle\LifecycleHandler(
                 id: 'after-handler',
-                callable: function() use (&$events) {
+                callable: function () use (&$events) {
                     $events[] = 'afterValidation';
                 },
                 supportedEvents: ['afterValidation']
@@ -442,14 +442,14 @@ class ValidationFrameworkTest extends TestCase
         $this->lifecycleManager->register(
             new \WaysNX\BusinessFramework\Lifecycle\LifecycleHandler(
                 id: 'completed-handler',
-                callable: function() use (&$events) {
+                callable: function () use (&$events) {
                     $events[] = 'validationCompleted';
                 },
                 supportedEvents: ['validationCompleted']
             )
         );
 
-        $framework = new class($this->registry, $this->lifecycleManager) extends ValidationFramework {
+        $framework = new class ($this->registry, $this->lifecycleManager) extends ValidationFramework {
             protected function evaluateRule($rule, $context): bool
             {
                 return true; // Pass
@@ -509,7 +509,7 @@ class ValidationFrameworkTest extends TestCase
 
         $this->registry->register($validation);
 
-        $framework = new class($this->registry, $this->lifecycleManager) extends ValidationFramework {
+        $framework = new class ($this->registry, $this->lifecycleManager) extends ValidationFramework {
             protected function evaluateRule($rule, $context): bool
             {
                 return false; // All fail
@@ -555,7 +555,7 @@ class ValidationFrameworkTest extends TestCase
 
         $this->registry->register($validation);
 
-        $framework = new class($this->registry, $this->lifecycleManager) extends ValidationFramework {
+        $framework = new class ($this->registry, $this->lifecycleManager) extends ValidationFramework {
             protected function evaluateRule($rule, $context): bool
             {
                 return false;
@@ -613,7 +613,7 @@ class ValidationFrameworkTest extends TestCase
 
         $calls = [];
 
-        $framework = new class($this->registry, $this->lifecycleManager) extends ValidationFramework {
+        $framework = new class ($this->registry, $this->lifecycleManager) extends ValidationFramework {
             public $calls = [];
 
             protected function beforeExecute($validation, $context): void
@@ -681,7 +681,7 @@ class ValidationFrameworkTest extends TestCase
 
         $this->registry->register($validation);
 
-        $framework = new class($this->registry, $this->lifecycleManager) extends ValidationFramework {
+        $framework = new class ($this->registry, $this->lifecycleManager) extends ValidationFramework {
             protected function evaluateRule($rule, $context): bool
             {
                 return true;
@@ -733,7 +733,7 @@ class ValidationFrameworkTest extends TestCase
 
         $framework = new ValidationFramework($this->registry); // No lifecycle manager
 
-        $framework = new class($this->registry) extends ValidationFramework {
+        $framework = new class ($this->registry) extends ValidationFramework {
             protected function evaluateRule($rule, $context): bool
             {
                 return true;
@@ -769,7 +769,7 @@ class ValidationFrameworkTest extends TestCase
 
         $this->registry->register($validation);
 
-        $framework = new class($this->registry, $this->lifecycleManager) extends ValidationFramework {
+        $framework = new class ($this->registry, $this->lifecycleManager) extends ValidationFramework {
             protected function evaluateRule($rule, $context): bool
             {
                 return false;

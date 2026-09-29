@@ -9,6 +9,7 @@ use WaysNX\BusinessFramework\Exceptions\DuplicateModuleException;
 use WaysNX\BusinessFramework\Exceptions\ModuleNotFoundException;
 use WaysNX\BusinessFramework\Registry\ModuleDefinition;
 use WaysNX\BusinessFramework\Registry\ModuleRegistry;
+use WaysNX\BusinessFramework\Tests\Unit\Registry\TestModuleRegistry;
 
 /**
  * ModuleRegistryTest
@@ -902,104 +903,5 @@ class ModuleRegistryTest extends TestCase
         $this->assertSame($this->registry, $result);
         $this->assertTrue($this->registry->exists('simple'));
         $this->assertFalse($this->registry->namespaceExists(''));
-    }
-}
-
-/**
- * TestModuleRegistry
- *
- * Test implementation of ModuleRegistry that tracks hook calls.
- *
-
- * @package WaysNX\BusinessFramework\Tests\Registry
- */
-class TestModuleRegistry extends ModuleRegistry
-{
-    /**
-     * Track if beforeRegister was called
-     *
-
-     * @var bool
-     */
-    public bool $beforeRegisterCalled = false;
-
-    /**
-     * Track if afterRegister was called
-     *
-
-     * @var bool
-     */
-    public bool $afterRegisterCalled = false;
-
-    /**
-     * Track if beforeUnregister was called
-     *
-
-     * @var bool
-     */
-    public bool $beforeUnregisterCalled = false;
-
-    /**
-     * Track if afterUnregister was called
-     *
-
-     * @var bool
-     */
-    public bool $afterUnregisterCalled = false;
-
-    /**
-     * Override beforeRegister to track calls
-     *
-
-     * @param ModuleDefinition $definition The module definition
-     *
-
-     * @return void
-     */
-    protected function beforeRegister(ModuleDefinition $definition): void
-    {
-        $this->beforeRegisterCalled = true;
-    }
-
-    /**
-     * Override afterRegister to track calls
-     *
-
-     * @param ModuleDefinition $definition The module definition
-     *
-
-     * @return void
-     */
-    protected function afterRegister(ModuleDefinition $definition): void
-    {
-        $this->afterRegisterCalled = true;
-    }
-
-    /**
-     * Override beforeUnregister to track calls
-     *
-
-     * @param ModuleDefinition $definition The module definition
-     *
-
-     * @return void
-     */
-    protected function beforeUnregister(ModuleDefinition $definition): void
-    {
-        $this->beforeUnregisterCalled = true;
-    }
-
-    /**
-     * Override afterUnregister to track calls
-     *
-
-     * @param ModuleDefinition $definition The module definition
-     *
-
-     * @return void
-     */
-    protected function afterUnregister(ModuleDefinition $definition): void
-    {
-        $this->afterUnregisterCalled = true;
     }
 }

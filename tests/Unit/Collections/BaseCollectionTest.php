@@ -9,6 +9,8 @@ use WaysNX\BusinessFramework\Collections\BaseCollection;
 use WaysNX\BusinessFramework\Contracts\CollectionInterface;
 use WaysNX\BusinessFramework\Models\BaseModel;
 
+require_once __DIR__ . '/TestCollection.php';
+
 /**
  * BaseCollectionTest
  *
@@ -611,7 +613,7 @@ class BaseCollectionTest extends TestCase
     public function testExtensionHooksAreCalled(): void
     {
         $service = new TestCollection(['a', 'b', 'c']);
-        
+
         $service->filter(fn($item) => true);
         $this->assertTrue($service->beforeTransformCalled);
         $this->assertTrue($service->afterTransformCalled);
@@ -686,90 +688,5 @@ class BaseCollectionTest extends TestCase
         $this->assertTrue($collection->contains(1));
         $this->assertTrue($collection->contains('string'));
         $this->assertTrue($collection->contains(null));
-    }
-}
-
-/**
- * TestCollection - Test collection with hook tracking
- *
-
- * @package WaysNX\BusinessFramework\Tests\Unit\Collections
- */
-class TestCollection extends BaseCollection
-{
-    /**
-     * Track if beforeTransform was called
-     *
-
-     * @var bool
-     */
-    public bool $beforeTransformCalled = false;
-
-    /**
-     * Track if afterTransform was called
-     *
-
-     * @var bool
-     */
-    public bool $afterTransformCalled = false;
-
-    /**
-     * Track if beforeSerialize was called
-     *
-
-     * @var bool
-     */
-    public bool $beforeSerializeCalled = false;
-
-    /**
-     * Track if afterSerialize was called
-     *
-
-     * @var bool
-     */
-    public bool $afterSerializeCalled = false;
-
-    /**
-     * Override beforeTransform
-     *
-
-     * @return void
-     */
-    protected function beforeTransform(): void
-    {
-        $this->beforeTransformCalled = true;
-    }
-
-    /**
-     * Override afterTransform
-     *
-
-     * @return void
-     */
-    protected function afterTransform(): void
-    {
-        $this->afterTransformCalled = true;
-    }
-
-    /**
-     * Override beforeSerialize
-     *
-
-     * @return void
-     */
-    protected function beforeSerialize(): void
-    {
-        $this->beforeSerializeCalled = true;
-    }
-
-    /**
-     * Override afterSerialize
-     *
-
-     * @return void
-     */
-    protected function afterSerialize(): void
-    {
-        $this->afterSerializeCalled = true;
     }
 }

@@ -139,7 +139,7 @@ class ValidatorIntegrationTest extends TestCase
     /**
      * Test 1: Valid BFD passes validation
      */
-    public function test_valid_bfd_passes_validation(): void
+    public function testValidBfdPassesValidation(): void
     {
         $bf = new class extends BusinessFunction {
             public function __construct()
@@ -193,7 +193,7 @@ class ValidatorIntegrationTest extends TestCase
     /**
      * Test 2: BFD missing functionId fails validation
      */
-    public function test_bfd_missing_function_id_fails_validation(): void
+    public function testBfdMissingFunctionIdFailsValidation(): void
     {
         $bfd = [
             'identity' => [
@@ -218,7 +218,7 @@ class ValidatorIntegrationTest extends TestCase
     /**
      * Test 3: BFD missing functionName fails validation
      */
-    public function test_bfd_missing_function_name_fails_validation(): void
+    public function testBfdMissingFunctionNameFailsValidation(): void
     {
         $bfd = [
             'identity' => [
@@ -243,7 +243,7 @@ class ValidatorIntegrationTest extends TestCase
     /**
      * Test 4: BFD missing version fails validation
      */
-    public function test_bfd_missing_version_fails_validation(): void
+    public function testBfdMissingVersionFailsValidation(): void
     {
         $bfd = [
             'identity' => [
@@ -268,7 +268,7 @@ class ValidatorIntegrationTest extends TestCase
     /**
      * Test 5: BFD missing contract section fails validation
      */
-    public function test_bfd_missing_contract_section_fails_validation(): void
+    public function testBfdMissingContractSectionFailsValidation(): void
     {
         $bfd = [
             'identity' => [
@@ -292,7 +292,7 @@ class ValidatorIntegrationTest extends TestCase
     /**
      * Test 6: BFD missing request contract fails validation
      */
-    public function test_bfd_missing_request_contract_fails_validation(): void
+    public function testBfdMissingRequestContractFailsValidation(): void
     {
         $bfd = [
             'identity' => [
@@ -320,7 +320,7 @@ class ValidatorIntegrationTest extends TestCase
     /**
      * Test 7: BFD missing response contract fails validation
      */
-    public function test_bfd_missing_response_contract_fails_validation(): void
+    public function testBfdMissingResponseContractFailsValidation(): void
     {
         $bfd = [
             'identity' => [
@@ -348,7 +348,7 @@ class ValidatorIntegrationTest extends TestCase
     /**
      * Test 8: BFD missing processing section fails validation
      */
-    public function test_bfd_missing_processing_section_fails_validation(): void
+    public function testBfdMissingProcessingSectionFailsValidation(): void
     {
         $bfd = [
             'identity' => [
@@ -372,7 +372,7 @@ class ValidatorIntegrationTest extends TestCase
     /**
      * Test 9: BFD missing operational section fails validation
      */
-    public function test_bfd_missing_operational_section_fails_validation(): void
+    public function testBfdMissingOperationalSectionFailsValidation(): void
     {
         $bfd = [
             'identity' => [
@@ -396,7 +396,7 @@ class ValidatorIntegrationTest extends TestCase
     /**
      * Test 10: BFD missing metadata description fails validation
      */
-    public function test_bfd_missing_metadata_description_fails_validation(): void
+    public function testBfdMissingMetadataDescriptionFailsValidation(): void
     {
         $bfd = [
             'identity' => [
@@ -431,7 +431,7 @@ class ValidatorIntegrationTest extends TestCase
      * This is the core round-trip test showing:
      * BusinessFunction → getCompleteContractDefinition() → BFD → Validator → VALID
      */
-    public function test_business_function_round_trip_validation(): void
+    public function testBusinessFunctionRoundTripValidation(): void
     {
         // Create a real BusinessFunction
         $bf = new class extends BusinessFunction {

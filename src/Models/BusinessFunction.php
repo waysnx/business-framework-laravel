@@ -34,7 +34,7 @@ use JsonSerializable;
  *         $this->functionName = 'Apply Leave';
  *         $this->functionVersion = '1.0.0';
  *         // ... other properties ...
- *         
+ *
  *         // Initialize
  *         $this->initializeBusinessFunction();
  *     }

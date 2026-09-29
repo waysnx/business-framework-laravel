@@ -6,25 +6,19 @@ namespace WaysNX\BusinessFramework\Tests\Unit\ServiceProvider;
 
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
-
 use WaysNX\BusinessFramework\ServiceProvider\LaravelServiceProvider;
 use WaysNX\BusinessFramework\ServiceProvider\BusinessFrameworkServiceProvider;
-
 use WaysNX\BusinessFramework\Registry\WorkflowRegistry;
 use WaysNX\BusinessFramework\Registry\EntityRegistry;
 use WaysNX\BusinessFramework\Registry\ModuleRegistry;
 use WaysNX\BusinessFramework\Registry\ValidationRegistry;
 use WaysNX\BusinessFramework\Registry\BusinessFunctionRegistry;
-
 use WaysNX\BusinessFramework\Workflow\WorkflowEngine;
 use WaysNX\BusinessFramework\Validation\ValidationFramework;
-
 use WaysNX\BusinessFramework\Lifecycle\LifecycleManager;
-
 use WaysNX\BusinessFramework\Collections\BaseCollection;
 use WaysNX\BusinessFramework\Repositories\BaseRepository;
 use WaysNX\BusinessFramework\Services\BaseService;
-
 use WaysNX\BusinessFramework\Contracts\CollectionInterface;
 use WaysNX\BusinessFramework\Contracts\RepositoryInterface;
 use WaysNX\BusinessFramework\Contracts\ServiceInterface;
@@ -99,7 +93,7 @@ class BusinessFrameworkServiceProviderTest extends TestCase
      * @test
      * @group laravel-integration
      */
-    public function test_laravel_service_provider_extends_illuminate_support_service_provider(): void
+    public function testLaravelServiceProviderExtendsIlluminateSupportServiceProvider(): void
     {
         $this->assertInstanceOf(\Illuminate\Support\ServiceProvider::class, $this->provider);
     }
@@ -108,7 +102,7 @@ class BusinessFrameworkServiceProviderTest extends TestCase
      * @test
      * @group laravel-integration
      */
-    public function test_provider_returns_array_from_provides_method(): void
+    public function testProviderReturnsArrayFromProvidesMethod(): void
     {
         $provides = $this->provider->provides();
 
@@ -121,7 +115,7 @@ class BusinessFrameworkServiceProviderTest extends TestCase
      * @test
      * @group laravel-integration
      */
-    public function test_all_provided_services_are_string_class_or_interface_names(): void
+    public function testAllProvidedServicesAreStringClassOrInterfaceNames(): void
     {
         $provides = $this->provider->provides();
 
@@ -140,7 +134,7 @@ class BusinessFrameworkServiceProviderTest extends TestCase
      * @test
      * @group laravel-integration
      */
-    public function test_workflow_registry_is_resolvable(): void
+    public function testWorkflowRegistryIsResolvable(): void
     {
         $registry = $this->container->make(WorkflowRegistry::class);
 
@@ -151,7 +145,7 @@ class BusinessFrameworkServiceProviderTest extends TestCase
      * @test
      * @group laravel-integration
      */
-    public function test_workflow_registry_is_singleton(): void
+    public function testWorkflowRegistryIsSingleton(): void
     {
         $registry1 = $this->container->make(WorkflowRegistry::class);
         $registry2 = $this->container->make(WorkflowRegistry::class);
@@ -163,7 +157,7 @@ class BusinessFrameworkServiceProviderTest extends TestCase
      * @test
      * @group laravel-integration
      */
-    public function test_entity_registry_is_resolvable(): void
+    public function testEntityRegistryIsResolvable(): void
     {
         $registry = $this->container->make(EntityRegistry::class);
 
@@ -174,7 +168,7 @@ class BusinessFrameworkServiceProviderTest extends TestCase
      * @test
      * @group laravel-integration
      */
-    public function test_entity_registry_is_singleton(): void
+    public function testEntityRegistryIsSingleton(): void
     {
         $registry1 = $this->container->make(EntityRegistry::class);
         $registry2 = $this->container->make(EntityRegistry::class);
@@ -186,7 +180,7 @@ class BusinessFrameworkServiceProviderTest extends TestCase
      * @test
      * @group laravel-integration
      */
-    public function test_module_registry_is_resolvable(): void
+    public function testModuleRegistryIsResolvable(): void
     {
         $registry = $this->container->make(ModuleRegistry::class);
 
@@ -197,7 +191,7 @@ class BusinessFrameworkServiceProviderTest extends TestCase
      * @test
      * @group laravel-integration
      */
-    public function test_module_registry_is_singleton(): void
+    public function testModuleRegistryIsSingleton(): void
     {
         $registry1 = $this->container->make(ModuleRegistry::class);
         $registry2 = $this->container->make(ModuleRegistry::class);
@@ -209,7 +203,7 @@ class BusinessFrameworkServiceProviderTest extends TestCase
      * @test
      * @group laravel-integration
      */
-    public function test_validation_registry_is_resolvable(): void
+    public function testValidationRegistryIsResolvable(): void
     {
         $registry = $this->container->make(ValidationRegistry::class);
 
@@ -220,7 +214,7 @@ class BusinessFrameworkServiceProviderTest extends TestCase
      * @test
      * @group laravel-integration
      */
-    public function test_validation_registry_is_singleton(): void
+    public function testValidationRegistryIsSingleton(): void
     {
         $registry1 = $this->container->make(ValidationRegistry::class);
         $registry2 = $this->container->make(ValidationRegistry::class);
@@ -232,7 +226,7 @@ class BusinessFrameworkServiceProviderTest extends TestCase
      * @test
      * @group laravel-integration
      */
-    public function test_business_function_registry_is_resolvable(): void
+    public function testBusinessFunctionRegistryIsResolvable(): void
     {
         $registry = $this->container->make(BusinessFunctionRegistry::class);
 
@@ -243,7 +237,7 @@ class BusinessFrameworkServiceProviderTest extends TestCase
      * @test
      * @group laravel-integration
      */
-    public function test_business_function_registry_is_singleton(): void
+    public function testBusinessFunctionRegistryIsSingleton(): void
     {
         $registry1 = $this->container->make(BusinessFunctionRegistry::class);
         $registry2 = $this->container->make(BusinessFunctionRegistry::class);
@@ -259,7 +253,7 @@ class BusinessFrameworkServiceProviderTest extends TestCase
      * @test
      * @group laravel-integration
      */
-    public function test_lifecycle_manager_is_resolvable(): void
+    public function testLifecycleManagerIsResolvable(): void
     {
         $manager = $this->container->make(LifecycleManager::class);
 
@@ -270,7 +264,7 @@ class BusinessFrameworkServiceProviderTest extends TestCase
      * @test
      * @group laravel-integration
      */
-    public function test_lifecycle_manager_is_singleton(): void
+    public function testLifecycleManagerIsSingleton(): void
     {
         $manager1 = $this->container->make(LifecycleManager::class);
         $manager2 = $this->container->make(LifecycleManager::class);
@@ -286,7 +280,7 @@ class BusinessFrameworkServiceProviderTest extends TestCase
      * @test
      * @group laravel-integration
      */
-    public function test_workflow_engine_is_resolvable(): void
+    public function testWorkflowEngineIsResolvable(): void
     {
         $engine = $this->container->make(WorkflowEngine::class);
 
@@ -297,7 +291,7 @@ class BusinessFrameworkServiceProviderTest extends TestCase
      * @test
      * @group laravel-integration
      */
-    public function test_workflow_engine_is_singleton(): void
+    public function testWorkflowEngineIsSingleton(): void
     {
         $engine1 = $this->container->make(WorkflowEngine::class);
         $engine2 = $this->container->make(WorkflowEngine::class);
@@ -309,7 +303,7 @@ class BusinessFrameworkServiceProviderTest extends TestCase
      * @test
      * @group laravel-integration
      */
-    public function test_workflow_engine_receives_workflow_registry_dependency(): void
+    public function testWorkflowEngineReceivesWorkflowRegistryDependency(): void
     {
         $registry = $this->container->make(WorkflowRegistry::class);
         $engine = $this->container->make(WorkflowEngine::class);
@@ -327,7 +321,7 @@ class BusinessFrameworkServiceProviderTest extends TestCase
      * @test
      * @group laravel-integration
      */
-    public function test_workflow_engine_receives_lifecycle_manager_dependency(): void
+    public function testWorkflowEngineReceivesLifecycleManagerDependency(): void
     {
         $manager = $this->container->make(LifecycleManager::class);
         $engine = $this->container->make(WorkflowEngine::class);
@@ -345,7 +339,7 @@ class BusinessFrameworkServiceProviderTest extends TestCase
      * @test
      * @group laravel-integration
      */
-    public function test_validation_framework_is_resolvable(): void
+    public function testValidationFrameworkIsResolvable(): void
     {
         $framework = $this->container->make(ValidationFramework::class);
 
@@ -356,7 +350,7 @@ class BusinessFrameworkServiceProviderTest extends TestCase
      * @test
      * @group laravel-integration
      */
-    public function test_validation_framework_is_singleton(): void
+    public function testValidationFrameworkIsSingleton(): void
     {
         $framework1 = $this->container->make(ValidationFramework::class);
         $framework2 = $this->container->make(ValidationFramework::class);
@@ -368,7 +362,7 @@ class BusinessFrameworkServiceProviderTest extends TestCase
      * @test
      * @group laravel-integration
      */
-    public function test_validation_framework_receives_validation_registry_dependency(): void
+    public function testValidationFrameworkReceivesValidationRegistryDependency(): void
     {
         $registry = $this->container->make(ValidationRegistry::class);
         $framework = $this->container->make(ValidationFramework::class);
@@ -386,7 +380,7 @@ class BusinessFrameworkServiceProviderTest extends TestCase
      * @test
      * @group laravel-integration
      */
-    public function test_validation_framework_receives_lifecycle_manager_dependency(): void
+    public function testValidationFrameworkReceivesLifecycleManagerDependency(): void
     {
         $manager = $this->container->make(LifecycleManager::class);
         $framework = $this->container->make(ValidationFramework::class);
@@ -408,7 +402,7 @@ class BusinessFrameworkServiceProviderTest extends TestCase
      * @test
      * @group laravel-integration
      */
-    public function test_collection_interface_resolves_to_base_collection(): void
+    public function testCollectionInterfaceResolvesToBaseCollection(): void
     {
         $collection = $this->container->make(CollectionInterface::class);
 
@@ -420,7 +414,7 @@ class BusinessFrameworkServiceProviderTest extends TestCase
      * @test
      * @group laravel-integration
      */
-    public function test_collection_interface_is_transient(): void
+    public function testCollectionInterfaceIsTransient(): void
     {
         $collection1 = $this->container->make(CollectionInterface::class);
         $collection2 = $this->container->make(CollectionInterface::class);
@@ -432,11 +426,11 @@ class BusinessFrameworkServiceProviderTest extends TestCase
      * @test
      * @group laravel-integration
      */
-    public function test_repository_interface_resolves_to_base_repository(): void
+    public function testRepositoryInterfaceResolvesToBaseRepository(): void
     {
         // Check that the binding exists and is configured
         $this->assertTrue($this->container->bound(RepositoryInterface::class));
-        
+
         // Note: BaseRepository requires a model parameter in constructor
         // The binding is correct; direct instantiation would require providing a model
         // In real usage: $repository = app(RepositoryInterface::class) with $app->bind()
@@ -447,7 +441,7 @@ class BusinessFrameworkServiceProviderTest extends TestCase
      * @test
      * @group laravel-integration
      */
-    public function test_repository_interface_is_transient(): void
+    public function testRepositoryInterfaceIsTransient(): void
     {
         // Verify the binding is transient (not singleton/shared)
         // by checking it's not in the shared instances
@@ -458,11 +452,11 @@ class BusinessFrameworkServiceProviderTest extends TestCase
      * @test
      * @group laravel-integration
      */
-    public function test_service_interface_resolves_to_base_service(): void
+    public function testServiceInterfaceResolvesToBaseService(): void
     {
         // Check that the binding exists
         $this->assertTrue($this->container->bound(ServiceInterface::class));
-        
+
         // Note: BaseService requires a RepositoryInterface which in turn requires a model
         // The binding is correct, but direct instantiation requires model resolution
         // In real usage: $service = app(ServiceInterface::class) with proper model bindings
@@ -472,7 +466,7 @@ class BusinessFrameworkServiceProviderTest extends TestCase
      * @test
      * @group laravel-integration
      */
-    public function test_service_interface_is_transient(): void
+    public function testServiceInterfaceIsTransient(): void
     {
         // Verify the binding is transient (not singleton/shared)
         $this->assertFalse($this->container->isShared(ServiceInterface::class));
@@ -482,7 +476,7 @@ class BusinessFrameworkServiceProviderTest extends TestCase
      * @test
      * @group laravel-integration
      */
-    public function test_base_service_binding_requires_repository_interface(): void
+    public function testBaseServiceBindingRequiresRepositoryInterface(): void
     {
         // Verify that the binding for ServiceInterface is configured
         // It requires RepositoryInterface which is resolvable
@@ -498,7 +492,7 @@ class BusinessFrameworkServiceProviderTest extends TestCase
      * @test
      * @group laravel-integration
      */
-    public function test_configuration_file_exists(): void
+    public function testConfigurationFileExists(): void
     {
         $configPath = dirname(__DIR__, 3) . '/config/business-framework.php';
         $this->assertFileExists($configPath);
@@ -508,7 +502,7 @@ class BusinessFrameworkServiceProviderTest extends TestCase
      * @test
      * @group laravel-integration
      */
-    public function test_configuration_file_has_all_required_sections(): void
+    public function testConfigurationFileHasAllRequiredSections(): void
     {
         $configPath = dirname(__DIR__, 3) . '/config/business-framework.php';
         $content = file_get_contents($configPath);
@@ -527,7 +521,7 @@ class BusinessFrameworkServiceProviderTest extends TestCase
      * @test
      * @group laravel-integration
      */
-    public function test_base_provider_documentation_is_accessible(): void
+    public function testBaseProviderDocumentationIsAccessible(): void
     {
         $documentation = BusinessFrameworkServiceProvider::getBindingDocumentation();
 

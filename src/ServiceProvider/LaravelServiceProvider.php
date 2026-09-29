@@ -5,22 +5,17 @@ declare(strict_types=1);
 namespace WaysNX\BusinessFramework\ServiceProvider;
 
 use Illuminate\Support\ServiceProvider;
-
 use WaysNX\BusinessFramework\Registry\WorkflowRegistry;
 use WaysNX\BusinessFramework\Registry\EntityRegistry;
 use WaysNX\BusinessFramework\Registry\ModuleRegistry;
 use WaysNX\BusinessFramework\Registry\ValidationRegistry;
 use WaysNX\BusinessFramework\Registry\BusinessFunctionRegistry;
-
 use WaysNX\BusinessFramework\Lifecycle\LifecycleManager;
-
 use WaysNX\BusinessFramework\Workflow\WorkflowEngine;
 use WaysNX\BusinessFramework\Validation\ValidationFramework;
-
 use WaysNX\BusinessFramework\Collections\BaseCollection;
 use WaysNX\BusinessFramework\Repositories\BaseRepository;
 use WaysNX\BusinessFramework\Services\BaseService;
-
 use WaysNX\BusinessFramework\Contracts\CollectionInterface;
 use WaysNX\BusinessFramework\Contracts\RepositoryInterface;
 use WaysNX\BusinessFramework\Contracts\ServiceInterface;

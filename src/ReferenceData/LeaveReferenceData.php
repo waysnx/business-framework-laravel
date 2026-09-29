@@ -199,7 +199,7 @@ class LeaveReferenceData
      * Existing approved leave requests
      *
      * In production: SELECT * FROM leave_requests WHERE status = 'Approved' AND employee_id = ?
-     * 
+     *
      * NOTE: Approved leave dates are calculated relative to today to ensure tests
      * work regardless of when they run. We set them 90-94 days in the future to avoid
      * conflicts with regular test dates.
@@ -213,7 +213,7 @@ class LeaveReferenceData
         $endDate1 = (new \DateTime())
             ->add(new \DateInterval('P94D'))
             ->format('Y-m-d');
-        
+
         $startDate2 = (new \DateTime())
             ->add(new \DateInterval('P100D'))
             ->format('Y-m-d');
@@ -388,7 +388,7 @@ class LeaveReferenceData
         if (self::$approvedLeave === null) {
             self::$approvedLeave = self::getApprovedLeave();
         }
-        
+
         $employeeLeave = self::$approvedLeave[$employeeId] ?? [];
         $overlapping = [];
 
