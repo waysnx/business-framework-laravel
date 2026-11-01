@@ -10,7 +10,7 @@ namespace WaysNX\BusinessFramework\Types;
  * Framework-independent contract for Business Functions in WBF.
  *
  * A Business Function represents a single, well-defined business operation.
- * Every Business Function SHALL conform to this specification (WBF-DOC-0005).
+ * Every Business Function SHALL conform to this specification (WBF-SPEC-0005).
  *
  * Responsibilities:
  * - Define a stable Function Identity (ID, Name, Version, Module, Domain, Capability)
@@ -25,7 +25,7 @@ namespace WaysNX\BusinessFramework\Types;
  * - Implementations in other frameworks should implement this interface
  *
  * Conformance:
- * - WBF-DOC-0005: Business Function Specification
+ * - WBF-SPEC-0005: Business Function Specification
  * - Section 8: Function Identity
  * - Section 9: Function Metadata
  * - Section 10-12: Business Contracts

@@ -2,6 +2,8 @@
 
 Official Laravel 13 implementation of the WaysNX Business Framework (WBF).
 
+> **Unreleased changes on this branch (Phase 0.1, 2026-11-01).** Breaking: `Registry\WorkflowStep` requires a `sequence` (no default of `0`). Additive: `BusinessFunctionRuntime::run()` returns an `ExecutionResult` with six statuses, and categorized exceptions control classification. See [Execution results and error categories](#execution-results-and-error-categories-phase-01).
+
 ## What is WBF?
 
 WBF is an enterprise-grade architecture framework for building business applications with structured design patterns, governance, and standardized practices. It enables teams to:
@@ -518,13 +520,25 @@ Immutable value object carrying execution context:
 
 ### Workflow Execution Lifecycle
 
-1. **Setup** — WorkflowContext carries execution parameters
-2. **Step Execution** — Each workflow step executes in sequence
-3. **Step Function Invocation** — WorkflowEngine invokes business functions associated with each step
-4. **Business Logic** — Business functions (developer-implemented) perform domain operations
-5. **State Management** — Business functions handle entity state changes (not automatic)
-6. **Step Completion** — Engine tracks completed/failed steps
-7. **Completion** — WorkflowResult reports outcome and timing
+1. **Setup** — WorkflowContext carries execution parameters. The host-supplied caller identity goes in `metadata['caller']`
+2. **Definition check** — Duplicate step IDs or duplicate/negative `sequence` values fail the run before any step executes
+3. **Step Execution** — Steps execute in ascending `sequence` order. Declaration (array) order is irrelevant
+4. **Step Function Invocation** — The default `executeBusinessFunction()` runs the Business Function registered with `WorkflowEngine::registerBusinessFunction()` through `BusinessFunctionRuntime` (validation → authorization → rules → execution → events). A step whose function is not registered **fails**. It no longer silently succeeds
+5. **Business Logic** — Business functions (developer-implemented) perform domain operations
+6. **State Management** — Business functions handle entity state changes (not automatic)
+7. **Step Completion** — Engine tracks completed/failed steps. With default transitions, a run that skipped any defined step is reported as failed
+8. **Completion** — WorkflowResult reports outcome and timing
+
+```php
+$engine = app(WorkflowEngine::class);
+$engine->registerBusinessFunction($applyLeave);   // BusinessFunctionInterface instance with an authorizer
+$result = $engine->execute('leave-approval', new WorkflowContext(
+    workflowId: 'leave-approval',
+    executionId: (string) Str::uuid(),
+    inputData: $request,
+    metadata: ['caller' => $user->id],
+));
+```
 
 ### WorkflowResult
 
@@ -548,11 +562,13 @@ Methods available:
 Subclass WorkflowEngine to customize behavior:
 
 - `beforeExecute()` — Called before workflow starts
-- `afterExecute()` — Called after workflow completes
 - `beforeStep()` — Called before each step
 - `afterStep()` — Called after each step
-- `executeBusinessFunction()` — Called to invoke step's function
-- `determineNextStep()` — Called to determine next step to execute
+- `beforeComplete()` / `afterComplete()` — Called around result creation
+- `executeBusinessFunction()` — Override to customize how a step's function is invoked (e.g. request mapping). The default runs the registered function through `BusinessFunctionRuntime`
+- `determineNextStep()` — Override for custom transitions. The default picks the smallest `sequence` greater than the current step. With an override, the "all steps executed" completeness check no longer applies
+
+(There is no `afterExecute()` hook; earlier versions of this README listed one in error.)
 
 ## Validation Framework
 
@@ -564,7 +580,112 @@ The **ValidationFramework** provides the structures and registration mechanisms 
 4. **Scope Application** — Validations apply to specific entity types or operation scopes
 5. **Declarative Specification** — Validation rules are defined separate from business logic
 
-**Current implementation:** The framework provides definition and registration of validations. Validation execution remains an application responsibility. Developers can query the ValidationRegistry to retrieve registered validation definitions and implement evaluation logic appropriate to their domain.
+**Current implementation (fails closed since Phase 0):**
+
+- **Built-in rule type `required`.** It fails when the target field (dot notation, resolved from `ValidationContext::$inputData`) is missing, `null`, an empty or whitespace-only string, or an empty array. `0` and `false` count as present. The default issue code is `WBF.VALIDATION.REQUIRED`.
+- **Every other rule type fails closed**, including the default `ruleType: 'custom'`. It produces an error issue `WBF.VALIDATION.UNKNOWN_RULE` unless your application implements it. Unknown rules are always errors, even when declared as warnings. A `required` rule without a target produces `WBF.VALIDATION.INVALID_RULE`.
+- **Warnings never block.** `ValidationResult::$passed` is true exactly when there are no error-severity issues. All failing rules are reported.
+- **Custom rules.** Subclass `ValidationFramework` and override `evaluateRule()`. Delegate types you do not handle to `parent::evaluateRule()`:
+
+```php
+class AppValidation extends ValidationFramework
+{
+    protected function evaluateRule(ValidationRuleDefinition $rule, ValidationContext $context): bool
+    {
+        return match ($rule->ruleType) {
+            'adult' => ($context->inputData[$rule->target] ?? 0) >= 18,
+            default => parent::evaluateRule($rule, $context),
+        };
+    }
+}
+```
+
+Integration with Laravel's `Validator` is planned (ADR-0007, milestone M4) and is not part of this release.
+
+## Authorization (fails closed since Phase 0)
+
+Every Business Function execution requires an **explicit** authorization decision. Without one, `execute()` throws `WaysNX\BusinessFramework\Exceptions\AuthorizationException` (a `\RuntimeException`) before any business rule or business logic runs. A caller value is identity input, never proof of authorization.
+
+Provide a decision in one of two ways:
+
+```php
+use WaysNX\BusinessFramework\Authorization\AuthorizationDecision;
+use WaysNX\BusinessFramework\Contracts\AuthorizerInterface;
+use WaysNX\BusinessFramework\Types\BusinessFunctionInterface;
+
+// 1) A host-supplied authorizer (e.g. delegating to Laravel Gate/Policies)
+class GateAuthorizer implements AuthorizerInterface
+{
+    public function authorize(BusinessFunctionInterface $function, array $request, mixed $caller)
+    {
+        return Gate::forUser($caller)->allows($function->getFunctionId(), [$request])
+            ? AuthorizationDecision::allow()
+            : AuthorizationDecision::deny('Policy denied');
+    }
+}
+$bf->setAuthorizer(new GateAuthorizer());
+
+// 2) Or override checkAuthorization() in the Business Function and deny explicitly:
+//    throw new \WaysNX\BusinessFramework\Exceptions\AuthorizationException('Not your request');
+//    Any other exception thrown while authorizing is treated as unexpected
+//    (run() reports execution_failure, not authorization_failure).
+```
+
+Return values other than an `AuthorizationDecision` are treated as invalid and denied. `AuthorizationException::getReasonCode()` returns `no_authorizer`, `invalid_decision` or `denied`. The API names are final (ADR-0010, approved 2026-11-01). Generated functions (`wbf:make`) must be given an authorizer before they can execute.
+
+## Execution results and error categories (Phase 0.1)
+
+`execute()` still throws on failure. `BusinessFunctionRuntime::run()` returns a structured `ExecutionResult` instead, with one of six statuses (Core WBF-SPEC-0006, decision D1):
+
+```php
+use WaysNX\BusinessFramework\Runtime\BusinessFunctionRuntime;
+use WaysNX\BusinessFramework\Runtime\ExecutionStatus;
+
+$result = (new BusinessFunctionRuntime())->run($applyLeave, $request, $caller);
+
+match ($result->status) {
+    ExecutionStatus::SUCCESS               => $result->response,
+    ExecutionStatus::VALIDATION_FAILURE    => /* 422 */ null,
+    ExecutionStatus::AUTHORIZATION_FAILURE => /* 403, $result->errorCode = no_authorizer|invalid_decision|denied */ null,
+    ExecutionStatus::NOT_FOUND             => /* 404 */ null,
+    ExecutionStatus::BUSINESS_RULE_FAILURE => /* 409/422 */ null,
+    ExecutionStatus::EXECUTION_FAILURE     => /* 500 */ null,
+};
+```
+
+`run()` never throws for a failed execution. An unexpected error becomes `execution_failure`.
+
+Public messages do not leak internals (BF-ERR-03, ADR-0009 amendment A1):
+
+- An `execution_failure` always has `errorMessage` = `An internal error occurred while executing the business function. Reference: <executionId>` and `errorReference` = the execution ID. The raw exception message is never in the result, in `toArray()` or in the JSON.
+- The full exception (message and stack) is sent to the runtime's error reporter with the same reference. The default reporter writes it with `error_log()`. Route it to your log channel by passing any PSR-3-style `error(string $message, array $context)` callable: `new BusinessFunctionRuntime([Log::channel('stack'), 'error'])` or `setErrorReporter(...)`. `$context['exception']` is the original `Throwable`.
+- `getException()` keeps the original exception for in-process diagnostics.
+- Validation, authorization, not-found and business-rule failures keep the message you wrote for callers and are not reported as errors.
+
+Throw the categorized exceptions from your hooks to control the status. They extend the SPL types `execute()` already documented, so existing `catch` blocks keep working:
+
+| Exception | Extends | Status |
+|---|---|---|
+| `Exceptions\ValidationFailedException` | `\InvalidArgumentException` | `validation_failure` |
+| `Exceptions\AuthorizationException` | `\RuntimeException` | `authorization_failure` |
+| `Exceptions\ResourceNotFoundException('Order', 'O-1')` | `\RuntimeException` | `not_found` |
+| `Exceptions\BusinessRuleViolationException` | `\RuntimeException` | `business_rule_failure` |
+
+Uncategorized exceptions fall back by pipeline phase in two controlled cases only: thrown from `evaluateBusinessRules()` → `business_rule_failure`; an `\InvalidArgumentException` from `validateRequest()` → `validation_failure`. Categorized exceptions always take precedence. There is **no** authorization fallback: a plain exception from `checkAuthorization()` or an authorizer is `execution_failure`; deny with `AuthorizationException`. Anything else → `execution_failure`. `not_found` is only for missing business resources; a framework lookup failure is `execution_failure`. `BusinessFunctionAbstract::getFailedPhase()` reports the phase of the last failure.
+
+### Migration: workflow step sequence is required (breaking, decision D8)
+
+`Registry\WorkflowStep` no longer defaults `sequence` to `0`. A step without a sequence previously ran first without warning. Now:
+
+```php
+new WorkflowStep('s1', 'HR.LEAVE.APPLY');      // throws WorkflowDefinitionException (missing_sequence)
+new WorkflowStep('s1', 'HR.LEAVE.APPLY', 0);   // OK: 0 is valid
+```
+
+- Missing, non-integer or negative sequences are rejected when the step is constructed.
+- Duplicate sequences are rejected when the `WorkflowDefinition` is constructed.
+- `WorkflowDefinitionException` extends `\InvalidArgumentException`; `getReasonCode()` returns `missing_sequence`, `invalid_sequence`, `negative_sequence` or `duplicate_sequence`.
+- `WorkflowEngine` keeps its own duplicate/negative check for definitions built by other means.
 
 ## Current Implementation Scope
 
@@ -590,7 +711,20 @@ Not currently included (planned for future phases):
 - WBF Studio (graphical modeling tool)
 - Advanced enterprise features
 
-This reflects Phase 1-4 implementation scope. The framework provides a solid foundation for business-first architecture. Advanced capabilities will be added as the framework evolves.
+Also not included: entity persistence. `Repositories\BaseRepository` does not persist data and its `transaction()` is a no-op (ADR-0006, milestone M5). Tenant context and tenant isolation are not implemented.
+
+## WBF Compatibility Status
+
+| | |
+|---|---|
+| WBF specification targeted | WBF-SPEC-0000…0007 (Draft, Core tag `v1.0.0-preview`; 0006/0007 not yet tagged) |
+| Package status | Early implementation, tag `v0.1.0` |
+| Own test suite | Passing (`vendor/bin/phpunit`) |
+| Shared conformance suite | v0.1.0 (Core `tests/conformance/fixtures`, untagged): **33 of 33 fixtures pass**, plus the suite-integrity check. No known differences (`tests/Conformance/conformance-known-differences.json` is empty). Covers narrow slices of validation, workflow sequencing, Business Function results, authorization and lifecycle enablement only |
+| Conformance CI | Prepared (`.github/workflows/conformance.yml`, manual trigger, pinned to `conformance-v0.1.0`). **Not active** until the Core tag exists |
+| Parity with the Node.js runtime | **Not claimed.** Both runtimes produce identical normalized outcomes for the 33 fixtures. Areas without fixtures (entities, events, serialization, error codes, execution context, tenancy) are unverified. See Core `docs/architecture/IMPLEMENTATION_CAPABILITY_MATRIX.md` |
+
+Status vocabulary: Specified (Core spec exists) → Implemented → Tested (this repo) → Conformance verified (shared fixtures) → Released (tagged). See `docs/CONFORMANCE_TESTING.md`.
 
 ## Laravel Integration
 
@@ -645,7 +779,7 @@ class AuditController {
 
 ### Service Provider Binding
 
-The `BusinessFrameworkServiceProvider` registers all WBF components:
+The auto-discovered `ServiceProvider\LaravelServiceProvider` registers the WBF components. `BusinessFrameworkServiceProvider` is documentation of the bindings only, not a Laravel service provider:
 
 ```php
 // All components are bound as singletons:
@@ -664,12 +798,12 @@ This means:
 
 WBF is designed so its core business concepts can be implemented across different technology stacks. The fundamental concepts (Module, Entity, Business Function, Validation, Workflow) are technology-agnostic.
 
-Currently verified implementations:
+Implementations:
 
-- **Laravel** — This package (PHP 8.3+, Laravel 13+)
-- **Node.js / TypeScript** — Available at [github.com/waysnx/business-framework-node](https://github.com/waysnx/business-framework-node)
+- **Laravel**: this package (PHP 8.3+, Laravel 13+)
+- **Node.js / TypeScript**: [github.com/waysnx/business-framework-node](https://github.com/waysnx/business-framework-node)
 
-Other technology implementations may be provided as the framework evolves. The business concepts remain consistent across platforms; implementation details adapt to each platform's conventions and capabilities.
+Both aim to produce equivalent business behavior. Equivalence is established only where both pass the shared conformance fixtures (see "WBF Compatibility Status"). It is not assumed elsewhere.
 
 ## For AI Agents and Automation
 
@@ -739,8 +873,10 @@ The WBF Laravel package structure:
 │   ├── Validation/            # Validation framework
 │   ├── Runtime/               # Runtime execution components
 │   ├── Console/               # Artisan CLI commands and generators
-│   ├── Providers/             # Service providers
-│   ├── Models/                # Base model classes
+│   ├── ServiceProvider/       # LaravelServiceProvider (auto-discovered) + binding documentation
+│   ├── Authorization/         # AuthorizationDecision (fail-closed authorization)
+│   ├── Models/                # Meta-model artifact classes (BaseModel is not an entity base)
+│   ├── Core/, Types/          # Framework-independent abstracts and interfaces
 │   ├── Lifecycle/             # Lifecycle event management
 │   ├── Contracts/             # Interfaces and contracts
 │   ├── Exceptions/            # Exception types

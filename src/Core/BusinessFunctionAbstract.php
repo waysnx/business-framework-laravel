@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace WaysNX\BusinessFramework\Core;
 
+use WaysNX\BusinessFramework\Authorization\AuthorizationDecision;
+use WaysNX\BusinessFramework\Contracts\AuthorizerInterface;
+use WaysNX\BusinessFramework\Exceptions\AuthorizationException;
 use WaysNX\BusinessFramework\Types\BusinessFunctionInterface;
 
 /**
@@ -11,7 +14,7 @@ use WaysNX\BusinessFramework\Types\BusinessFunctionInterface;
  *
  * Framework-independent base implementation of Business Functions.
  *
- * This abstract class provides the canonical Business Function model as defined in WBF-DOC-0005.
+ * This abstract class provides the canonical Business Function model as defined in WBF-SPEC-0005.
  * It extends BaseModelAbstract to inherit identity, versioning, audit tracking, and metadata support.
  *
  * Subclasses (concrete Business Functions) SHALL:
@@ -34,7 +37,7 @@ use WaysNX\BusinessFramework\Types\BusinessFunctionInterface;
  * - BF-07: Business Functions are discoverable through metadata
  * - BF-08: Business Functions remain implementation-independent
  *
- * Conformance: WBF-DOC-0005 Section 24 - Conformance
+ * Conformance: WBF-SPEC-0005 Section 24 - Conformance
  *
  * @implements BusinessFunctionInterface
  * @extends BaseModelAbstract
@@ -42,6 +45,24 @@ use WaysNX\BusinessFramework\Types\BusinessFunctionInterface;
  */
 abstract class BusinessFunctionAbstract extends BaseModelAbstract implements BusinessFunctionInterface
 {
+    /** Pipeline phase names (WBF-SPEC-0006 §3.2). */
+    public const PHASE_VALIDATION = 'validation';
+    public const PHASE_AUTHORIZATION = 'authorization';
+    public const PHASE_BUSINESS_RULES = 'businessRules';
+    public const PHASE_EXECUTION = 'execution';
+    public const PHASE_EVENTS = 'events';
+    public const PHASE_RESPONSE = 'response';
+
+    /**
+     * Host-supplied authorization decision point (fail-closed when null).
+     */
+    private ?AuthorizerInterface $authorizer = null;
+
+    /**
+     * Phase in which the last execute() call failed (null when it succeeded).
+     */
+    private ?string $failedPhase = null;
+
     // ========================================
     // FUNCTION IDENTITY
     // ========================================
@@ -587,7 +608,7 @@ abstract class BusinessFunctionAbstract extends BaseModelAbstract implements Bus
      * Execute this BusinessFunction through the canonical pipeline.
      *
      * This is the public execution contract that runtimes use to invoke business functions.
-     * It orchestrates the template methods in the order specified by WBF-DOC-0005:
+     * It orchestrates the template methods in the order specified by WBF-SPEC-0005:
      * 1. validateRequest() - BF-VAL-01
      * 2. checkAuthorization() - BF-SEC-01
      * 3. evaluateBusinessRules() - BF-BR-01
@@ -606,23 +627,49 @@ abstract class BusinessFunctionAbstract extends BaseModelAbstract implements Bus
      */
     public function execute(array $request, mixed $caller = null): array
     {
-        // Phase 1: Validation
-        $this->validateRequest($request);
+        // Record the pipeline phase that fails (WBF-SPEC-0006 §3.2, decision D1)
+        // so BusinessFunctionRuntime::run() can classify plain exceptions.
+        // The original exception is rethrown unchanged: execute() behaves
+        // exactly as before for its callers.
+        $this->failedPhase = null;
+        $phase = self::PHASE_VALIDATION;
 
-        // Phase 2: Authorization
-        $this->checkAuthorization($request, $caller);
+        try {
+            // Phase 1: Validation
+            $this->validateRequest($request);
 
-        // Phase 3: Business Rules
-        $this->evaluateBusinessRules($request);
+            // Phase 2: Authorization
+            $phase = self::PHASE_AUTHORIZATION;
+            $this->checkAuthorization($request, $caller);
 
-        // Phase 4: Execution
-        $result = $this->executeBusiness($request);
+            // Phase 3: Business Rules
+            $phase = self::PHASE_BUSINESS_RULES;
+            $this->evaluateBusinessRules($request);
 
-        // Phase 5: Event Publication
-        $this->publishEvents($request, $result);
+            // Phase 4: Execution
+            $phase = self::PHASE_EXECUTION;
+            $result = $this->executeBusiness($request);
 
-        // Phase 6: Response Transformation
-        return $this->transformToResponse($result);
+            // Phase 5: Event Publication
+            $phase = self::PHASE_EVENTS;
+            $this->publishEvents($request, $result);
+
+            // Phase 6: Response Transformation
+            $phase = self::PHASE_RESPONSE;
+            return $this->transformToResponse($result);
+        } catch (\Throwable $e) {
+            $this->failedPhase = $phase;
+            throw $e;
+        }
+    }
+
+    /**
+     * Pipeline phase in which the most recent execute() call failed, or null
+     * if it succeeded / has not run. One of the PHASE_* constants.
+     */
+    public function getFailedPhase(): ?string
+    {
+        return $this->failedPhase;
     }
 
     // ========================================
@@ -647,21 +694,73 @@ abstract class BusinessFunctionAbstract extends BaseModelAbstract implements Bus
     }
 
     /**
+     * Set the authorizer that provides explicit authorization decisions.
+     *
+     * Status: public API, approved (decision D6, ADR-0010, 2026-11-01).
+     *
+     * @param AuthorizerInterface $authorizer Host-supplied decision point
+     * @return static
+     */
+    public function setAuthorizer(AuthorizerInterface $authorizer): static
+    {
+        $this->authorizer = $authorizer;
+        return $this;
+    }
+
+    /**
+     * Get the configured authorizer, if any.
+     */
+    public function getAuthorizer(): ?AuthorizerInterface
+    {
+        return $this->authorizer;
+    }
+
+    /**
      * Check authorization
      *
-     * Override this method to provide authorization logic.
-     * This will be called after validation and before business rule evaluation.
+     * Authorization FAILS CLOSED (Phase 0 decision D6). Execution is allowed
+     * only when an explicit decision is obtained:
+     * - either a subclass overrides this method with its own explicit decision
+     *   logic (throwing on denial), or
+     * - an AuthorizerInterface is configured via setAuthorizer() and returns
+     *   AuthorizationDecision::allow().
+     *
+     * With no authorizer, an invalid (non-AuthorizationDecision) return value,
+     * or a deny decision, an AuthorizationException is thrown. The caller value
+     * is never treated as proof of authorization by itself.
      *
      * Requirement: BF-SEC-01 - Authorization SHALL occur after successful validation
      *
      * @param array $request The request data
      * @param mixed $caller The caller/user context (framework-specific)
-     * @throws \RuntimeException if authorization fails
+     * @throws AuthorizationException if authorization cannot be established or is denied
      * @return void
      */
     protected function checkAuthorization(array $request, mixed $caller = null): void
     {
-        // Subclasses override to implement authorization
+        if ($this->authorizer === null) {
+            throw new AuthorizationException(
+                "Authorization required for '{$this->getFunctionId()}': no authorizer configured",
+                AuthorizationException::REASON_NO_AUTHORIZER
+            );
+        }
+
+        $decision = $this->authorizer->authorize($this, $request, $caller);
+
+        if (!$decision instanceof AuthorizationDecision) {
+            throw new AuthorizationException(
+                "Authorization failed for '{$this->getFunctionId()}': authorizer returned an invalid decision",
+                AuthorizationException::REASON_INVALID_DECISION
+            );
+        }
+
+        if (!$decision->isAllowed()) {
+            $reason = $decision->reason !== '' ? $decision->reason : 'Access denied';
+            throw new AuthorizationException(
+                "Authorization denied for '{$this->getFunctionId()}': {$reason}",
+                AuthorizationException::REASON_DENIED
+            );
+        }
     }
 
     /**

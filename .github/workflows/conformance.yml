@@ -1,0 +1,86 @@
+# WBF cross-runtime conformance (ADR-0008, approved 2026-11-01).
+#
+# Status: PREPARED, NOT ACTIVE. Manual trigger only.
+# Activation is pending until the Core fixtures are committed and the tag
+# conformance-v0.1.0 exists in waysnx/waysnx-business-framework. To activate,
+# add push/pull_request triggers (same branches as ci.yml). Until the tag
+# exists a manual run fails at the Core checkout step, which is intended.
+#
+# WBF_CONFORMANCE_REQUIRED=1 turns a missing or misconfigured Core checkout
+# into a hard "CONFIGURATION ERROR" failure instead of a skip. Any failing
+# fixture or suite-integrity problem fails the job.
+name: WBF Conformance
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: conformance-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  WBF_CONFORMANCE_REF: conformance-v0.1.0
+  WBF_CONFORMANCE_REQUIRED: '1'
+  WBF_CONFORMANCE_FIXTURES: ${{ github.workspace }}/wbf-core/tests/conformance/fixtures
+  WBF_CONFORMANCE_REPORT: ${{ github.workspace }}/conformance-report-laravel.json
+
+jobs:
+  conformance:
+    name: Conformance (suite conformance-v0.1.0, PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php:
+          - '8.3'
+          - '8.4'
+
+    steps:
+      - name: Checkout
+        # Pinned to v4.0.0 (commit 11d5960, released 2024-07-16)
+        # Immutable SHA: pinned for reproducibility and supply-chain attack prevention
+        uses: actions/checkout@11d5960386772fe2a3bac13c20a58ce9e710ee99
+
+      - name: Checkout WBF Core fixtures (pinned)
+        # Pinned to v4.0.0 (commit 11d5960, released 2024-07-16)
+        # Immutable SHA: pinned for reproducibility
+        uses: actions/checkout@11d5960386772fe2a3bac13c20a58ce9e710ee99
+        with:
+          repository: waysnx/waysnx-business-framework
+          ref: ${{ env.WBF_CONFORMANCE_REF }}
+          path: wbf-core
+
+      - name: Verify Core checkout
+        run: |
+          test -f "$WBF_CONFORMANCE_FIXTURES/../suite.json" || {
+            echo "::error::CONFIGURATION ERROR: suite.json not found next to $WBF_CONFORMANCE_FIXTURES (ref $WBF_CONFORMANCE_REF)"
+            exit 1
+          }
+
+      - name: Setup PHP
+        # Pinned to v2.40.0 (released 2026-10-15, includes CVE-2026-46420 security fix)
+        # For latest security updates, monitor https://github.com/shivammathur/setup-php/releases
+        uses: shivammathur/setup-php@2c2f95e6e67cff92c0fcf8d30fa2bbf3b7d99c08
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mbstring, xml, ctype, json, bcmath
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Run conformance suite
+        run: vendor/bin/phpunit --testsuite conformance
+
+      - name: Upload conformance report
+        if: always()
+        # Pinned to v4.0.0 (commit 3c51c3a, released 2024-11-21)
+        # Immutable SHA: pinned for reproducibility
+        uses: actions/upload-artifact@3c51c3ac9657c1e591411f868e5d78dd9e2e50d5
+        with:
+          name: conformance-report-laravel
+          path: conformance-report-laravel.json
+          if-no-files-found: warn

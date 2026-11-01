@@ -107,10 +107,10 @@ abstract class DomainAbstract extends BaseModelAbstract
     protected string $description = '';
 
     /**
-     * Parent Module identifier (WBF-DOC-0007 Section 10, WBF-DOC-0004 Section 5.2)
+     * Parent Module identifier (WBF-DOC-0007 Section 10, WBF-SPEC-0004 Section 5.2)
      *
      * Identifies the Module this Domain belongs to.
-     * "A Domain SHALL belong to exactly one Module" (WBF-DOC-0004)
+     * "A Domain SHALL belong to exactly one Module" (WBF-SPEC-0004)
      *
      * @var string|int
      */
@@ -137,7 +137,7 @@ abstract class DomainAbstract extends BaseModelAbstract
     protected string $status = self::IDENTIFY;
 
     /**
-     * Domain capabilities (WBF-DOC-0007 Section 10, WBF-DOC-0004 Section 5.2)
+     * Domain capabilities (WBF-DOC-0007 Section 10, WBF-SPEC-0004 Section 5.2)
      *
      * Collection of business capabilities contained within this domain.
      * Each capability is represented as an array with minimal reference information.
@@ -327,7 +327,7 @@ abstract class DomainAbstract extends BaseModelAbstract
     }
 
     /**
-     * Get the parent Module identifier (WBF-DOC-0007 Section 10, WBF-DOC-0004 Section 5.2)
+     * Get the parent Module identifier (WBF-DOC-0007 Section 10, WBF-SPEC-0004 Section 5.2)
      *
      * @return string|int The module ID
      */
@@ -337,7 +337,7 @@ abstract class DomainAbstract extends BaseModelAbstract
     }
 
     /**
-     * Set the parent Module identifier (WBF-DOC-0007 Section 10, WBF-DOC-0004 Section 5.2)
+     * Set the parent Module identifier (WBF-DOC-0007 Section 10, WBF-SPEC-0004 Section 5.2)
      *
      * @param string|int $moduleId The module ID
      * @return void
@@ -411,7 +411,7 @@ abstract class DomainAbstract extends BaseModelAbstract
     }
 
     /**
-     * Get all capabilities (WBF-DOC-0007 Section 10, WBF-DOC-0004 Section 5.2)
+     * Get all capabilities (WBF-DOC-0007 Section 10, WBF-SPEC-0004 Section 5.2)
      *
      * @return array The list of capabilities
      */

@@ -17,7 +17,7 @@ use WaysNX\BusinessFramework\Types\BusinessFunctionInterface as FrameworkIndepen
  * Framework Compliance:
  * - Implements: WaysNX\BusinessFramework\Types\BusinessFunctionInterface
  * - Used by: Laravel BusinessFunction implementation
- * - Allows: Future framework implementations to use packages/types directly
+ * - Allows: Future framework implementations to use the framework-independent src/Types interfaces directly
  *
  * This adapter interface enables Laravel code to type-hint against Laravel-specific
  * interfaces while maintaining compatibility with the framework-independent contract.
