@@ -13,6 +13,8 @@ use WaysNX\BusinessFramework\Lifecycle\LifecycleManager;
 use WaysNX\BusinessFramework\Registry\WorkflowDefinition;
 use WaysNX\BusinessFramework\Registry\WorkflowRegistry;
 use WaysNX\BusinessFramework\Registry\WorkflowStep;
+use WaysNX\BusinessFramework\Runtime\BusinessFunctionRuntime;
+use WaysNX\BusinessFramework\Types\BusinessFunctionInterface;
 
 /**
  * WorkflowEngine
@@ -50,13 +52,21 @@ use WaysNX\BusinessFramework\Registry\WorkflowStep;
  * $result = $engine->execute('employee-onboarding', $context);
  * ```
  *
+ * Step execution:
+ * - Register Business Function instances with registerBusinessFunction();
+ *   each step executes its function through BusinessFunctionRuntime.
+ * - A step whose function is not registered fails (no silent success).
+ * - Steps run in ascending `sequence` order; duplicate step IDs or duplicate
+ *   sequences make the run fail before any step executes.
+ *
  * Extension Points:
  * - Override beforeExecute() for pre-execution hooks
- * - Override afterExecute() for post-execution hooks
  * - Override beforeStep() for pre-step hooks
  * - Override afterStep() for post-step hooks
- * - Override executeBusinessFunction() to invoke functions
- * - Override determineNextStep() for custom transitions
+ * - Override beforeComplete() / afterComplete() for completion hooks
+ * - Override executeBusinessFunction() to customize request mapping
+ * - Override determineNextStep() for custom transitions (the "all steps
+ *   executed" completeness check then no longer applies)
  *
  * @package WaysNX\BusinessFramework\Workflow
  */
@@ -85,6 +95,18 @@ class WorkflowEngine
      * @var array
      */
     private array $executionState = [];
+
+    /**
+     * Business Function instances available to workflow steps, keyed by function ID.
+     *
+     * @var array<string, BusinessFunctionInterface>
+     */
+    private array $businessFunctions = [];
+
+    /**
+     * Optional runtime used to execute step Business Functions.
+     */
+    private ?BusinessFunctionRuntime $businessFunctionRuntime = null;
 
     /**
      * Initialize a new WorkflowEngine
@@ -157,8 +179,14 @@ class WorkflowEngine
             $errors = [];
             $warnings = [];
 
+            // Phase 0 (LAR-02): reject structurally invalid step definitions
+            // (duplicate step IDs, duplicate or negative sequences) before any
+            // step executes. Step order is defined only by `sequence`.
+            $definitionErrors = $this->validateStepDefinitions($workflow);
+            $errors = array_merge($errors, $definitionErrors);
+
             // Execute steps sequentially
-            $currentStepId = $this->getFirstStep($workflow);
+            $currentStepId = empty($definitionErrors) ? $this->getFirstStep($workflow) : null;
 
             while (!empty($currentStepId)) {
                 try {
@@ -186,10 +214,23 @@ class WorkflowEngine
                 }
             }
 
+            // Phase 0 (LAR-02): with the default sequence-based transition logic,
+            // every defined step is required. A run that did not execute every
+            // step must not be reported as completed.
+            if (empty($definitionErrors) && empty($failedSteps) && $this->usesDefaultTransitions()) {
+                $skipped = array_values(array_diff(
+                    array_map(fn(WorkflowStep $s) => $s->id, $workflow->steps),
+                    $completedSteps
+                ));
+                if (!empty($skipped)) {
+                    $errors[] = 'Workflow did not execute required steps: ' . implode(', ', $skipped);
+                }
+            }
+
             $endTime = hrtime(true);
             $duration = (int) (($endTime - $startTime) / 1_000_000);
 
-            $status = empty($failedSteps) ? 'completed' : 'failed';
+            $status = (empty($failedSteps) && empty($errors)) ? 'completed' : 'failed';
 
             $this->beforeComplete($workflow, $context, $status, $completedSteps, $failedSteps);
 
@@ -272,8 +313,118 @@ class WorkflowEngine
      */
     protected function executeBusinessFunction(string $functionId, WorkflowContext $context): void
     {
-        // Extension point: application implements business function execution
-        // The framework does not execute business logic
+        // Phase 0 (LAR-03): the default implementation executes the registered
+        // Business Function through the standard BusinessFunctionRuntime pipeline
+        // (validation -> authorization -> rules -> execution -> events -> response).
+        // Subclasses may still override this method to customize request mapping.
+        if (!isset($this->businessFunctions[$functionId])) {
+            throw new WorkflowStepException(
+                "No business function registered for '{$functionId}'"
+            );
+        }
+
+        $runtime = $this->businessFunctionRuntime ?? new BusinessFunctionRuntime();
+
+        // Default request mapping: the workflow input data. The caller is
+        // host-supplied identity context (metadata key 'caller'); it is passed
+        // to the function's authorization step, which makes the decision.
+        //
+        // run() (not execute()) is used so that the step error recorded in the
+        // WorkflowResult carries the PUBLIC message: for an unexpected failure
+        // that is the safe message plus reference, never the raw exception
+        // message (BF-ERR-03, ADR-0009 amendment). The original exception is
+        // kept as the previous exception and reported server-side by run().
+        $result = $runtime->run(
+            $this->businessFunctions[$functionId],
+            $context->inputData,
+            $context->getMetadataValue('caller')
+        );
+
+        if ($result->failed()) {
+            throw new WorkflowStepException(
+                "Business function '{$functionId}' failed ({$result->status}): {$result->errorMessage}",
+                previous: $result->getException()
+            );
+        }
+    }
+
+    /**
+     * Register a Business Function instance for workflow step execution.
+     *
+     * Steps reference functions by ID (WorkflowStep::$businessFunctionId); the
+     * default executeBusinessFunction() resolves the instance registered here.
+     *
+     * @param BusinessFunctionInterface $function The function instance
+     * @return self
+     */
+    public function registerBusinessFunction(BusinessFunctionInterface $function): self
+    {
+        $this->businessFunctions[$function->getFunctionId()] = $function;
+        return $this;
+    }
+
+    /**
+     * Check whether a Business Function is registered for step execution.
+     */
+    public function hasBusinessFunction(string $functionId): bool
+    {
+        return isset($this->businessFunctions[$functionId]);
+    }
+
+    /**
+     * Use a specific BusinessFunctionRuntime for step execution
+     * (a new runtime per step is used otherwise).
+     */
+    public function setBusinessFunctionRuntime(BusinessFunctionRuntime $runtime): self
+    {
+        $this->businessFunctionRuntime = $runtime;
+        return $this;
+    }
+
+    /**
+     * Validate step definitions before execution.
+     *
+     * Rules (Phase 0 workflow sequencing contract):
+     * - step IDs must be unique
+     * - sequence values must be unique and non-negative
+     *
+     * @return array<string> Definition errors (empty when valid)
+     */
+    protected function validateStepDefinitions(WorkflowDefinition $workflow): array
+    {
+        $errors = [];
+        $ids = [];
+        $sequences = [];
+
+        foreach ($workflow->steps as $step) {
+            if (isset($ids[$step->id])) {
+                $errors[] = "Invalid workflow definition: duplicate step id '{$step->id}'";
+            }
+            $ids[$step->id] = true;
+
+            if ($step->sequence < 0) {
+                $errors[] = "Invalid workflow definition: step '{$step->id}' has negative sequence {$step->sequence}";
+            }
+
+            if (isset($sequences[$step->sequence])) {
+                $errors[] = "Invalid workflow definition: duplicate sequence {$step->sequence} "
+                    . "(steps '{$sequences[$step->sequence]}' and '{$step->id}')";
+            } else {
+                $sequences[$step->sequence] = $step->id;
+            }
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Whether the sequence-based transition logic of this class is in effect
+     * (i.e. determineNextStep() is not overridden by a subclass).
+     */
+    private function usesDefaultTransitions(): bool
+    {
+        return (new \ReflectionMethod($this, 'determineNextStep'))
+            ->getDeclaringClass()->getName() === self::class;
     }
 
     /**
@@ -338,14 +489,20 @@ class WorkflowEngine
         WorkflowStep $currentStep,
         array $completedSteps
     ): ?string {
-        // Look for next step based on sequence
+        // Phase 0 (LAR-02): the next step is the step with the smallest
+        // sequence strictly greater than the current one. Declaration (array)
+        // order is irrelevant.
+        $next = null;
         foreach ($workflow->steps as $step) {
-            if ($step->sequence > $currentStep->sequence) {
-                return $step->id;
+            if (
+                $step->sequence > $currentStep->sequence
+                && ($next === null || $step->sequence < $next->sequence)
+            ) {
+                $next = $step;
             }
         }
 
-        return null;
+        return $next?->id;
     }
 
     /**

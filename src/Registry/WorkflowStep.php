@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace WaysNX\BusinessFramework\Registry;
 
+use WaysNX\BusinessFramework\Exceptions\WorkflowDefinitionException;
+
 /**
  * WorkflowStep
  *
@@ -90,21 +92,52 @@ class WorkflowStep
      * Initialize a new WorkflowStep
      *
 
+     * Sequence contract (WBF-SPEC-0007, decision D8, approved 2026-11-01):
+     * `sequence` is REQUIRED. There is no implicit default of 0. A missing,
+     * non-integer or negative value is rejected here with a
+     * WorkflowDefinitionException. 0 is a valid sequence. The parameter is
+     * declared nullable/untyped only so that an omitted or invalid value
+     * produces a clear WBF error instead of a PHP TypeError or silent coercion.
+     *
+     * Migration: `new WorkflowStep($id, $fn)` (previously sequence 0) must now
+     * pass an explicit sequence, e.g. `new WorkflowStep($id, $fn, 0)`.
+     *
      * @param string $id The step identifier
      * @param string $businessFunctionId The referenced business function ID
-     * @param int $sequence The sequence in workflow
+     * @param int|null $sequence The sequence in workflow (required, integer >= 0)
      * @param string $description The step description
      * @param array<array> $transitions Transition definitions
      * @param array $metadata Step metadata
+     *
+     * @throws WorkflowDefinitionException If the sequence is missing, not an integer, or negative
      */
     public function __construct(
         string $id,
         string $businessFunctionId,
-        int $sequence = 0,
+        mixed $sequence = null,
         string $description = '',
         array $transitions = [],
         array $metadata = []
     ) {
+        if ($sequence === null) {
+            throw new WorkflowDefinitionException(
+                "Workflow step '{$id}': sequence is required",
+                WorkflowDefinitionException::REASON_MISSING_SEQUENCE
+            );
+        }
+        if (!is_int($sequence)) {
+            throw new WorkflowDefinitionException(
+                "Workflow step '{$id}': sequence must be an integer, got " . get_debug_type($sequence),
+                WorkflowDefinitionException::REASON_INVALID_SEQUENCE
+            );
+        }
+        if ($sequence < 0) {
+            throw new WorkflowDefinitionException(
+                "Workflow step '{$id}': sequence must be >= 0, got {$sequence}",
+                WorkflowDefinitionException::REASON_NEGATIVE_SEQUENCE
+            );
+        }
+
         $this->id = $id;
         $this->businessFunctionId = $businessFunctionId;
         $this->sequence = $sequence;

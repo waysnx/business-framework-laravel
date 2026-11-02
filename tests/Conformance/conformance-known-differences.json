@@ -1,0 +1,4 @@
+{
+  "description": "Fixture IDs this runtime is known not to satisfy yet. Each entry references a finding or pending decision. Entries must be removed as soon as the fixture passes (the adapter fails otherwise).",
+  "knownDifferences": {}
+}

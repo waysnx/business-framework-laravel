@@ -31,6 +31,24 @@ class ApplyLeaveRuntimeIntegrationTest extends TestCase
     }
 
     /**
+     * Deterministic date fixture relative to the same reference date that
+     * ApplyLeave::validateRequest() uses (`new DateTime('today')`).
+     *
+     * Offsets used in this class avoid the approved-leave windows defined in
+     * LeaveReferenceData::getApprovedLeave() (+90..+94 and +100..+102 days),
+     * so overlap rules never interfere with the scenarios under test.
+     *
+     * Replaces hard-coded 2026 dates that made these tests fail once the
+     * calendar passed them (finding LAR-04).
+     */
+    private function daysFromToday(int $offsetDays): string
+    {
+        return (new \DateTimeImmutable('today'))
+            ->modify(sprintf('%+d days', $offsetDays))
+            ->format('Y-m-d');
+    }
+
+    /**
      * Test 1: Runtime orchestrates complete pipeline
      *
      * Validates that Runtime's execute() method successfully coordinates
@@ -41,8 +59,8 @@ class ApplyLeaveRuntimeIntegrationTest extends TestCase
         $request = [
             'employeeId' => 'EMP-2026-001',
             'leaveType' => 'Annual',
-            'startDate' => '2026-10-15',
-            'endDate' => '2026-10-18',
+            'startDate' => $this->daysFromToday(14),
+            'endDate' => $this->daysFromToday(17),
             'reason' => 'Vacation',
         ];
 
@@ -78,8 +96,8 @@ class ApplyLeaveRuntimeIntegrationTest extends TestCase
         $request = [
             'employeeId' => 'EMP-2026-001',
             'leaveType' => 'Annual',
-            'startDate' => '2026-09-20',
-            'endDate' => '2026-09-15', // Invalid: end before start
+            'startDate' => $this->daysFromToday(20),
+            'endDate' => $this->daysFromToday(15), // Invalid: end before start
         ];
 
         $caller = [
@@ -111,8 +129,8 @@ class ApplyLeaveRuntimeIntegrationTest extends TestCase
         $request = [
             'employeeId' => 'EMP-2026-001',
             'leaveType' => 'Annual',
-            'startDate' => '2026-10-01',
-            'endDate' => '2026-10-03',
+            'startDate' => $this->daysFromToday(10),
+            'endDate' => $this->daysFromToday(12),
         ];
 
         $caller = [
@@ -142,8 +160,8 @@ class ApplyLeaveRuntimeIntegrationTest extends TestCase
         $request = [
             'employeeId' => 'EMP-2026-003', // Inactive employee
             'leaveType' => 'Annual',
-            'startDate' => '2026-10-05',
-            'endDate' => '2026-10-08',
+            'startDate' => $this->daysFromToday(21),
+            'endDate' => $this->daysFromToday(24),
         ];
 
         $caller = [
@@ -173,8 +191,8 @@ class ApplyLeaveRuntimeIntegrationTest extends TestCase
         $request = [
             'employeeId' => 'EMP-2026-002',
             'leaveType' => 'Annual',
-            'startDate' => '2026-10-20',
-            'endDate' => '2026-10-22',
+            'startDate' => $this->daysFromToday(30),
+            'endDate' => $this->daysFromToday(32),
         ];
 
         $caller = [
@@ -200,8 +218,8 @@ class ApplyLeaveRuntimeIntegrationTest extends TestCase
         $request = [
             'employeeId' => 'EMP-2026-001',
             'leaveType' => 'Annual',
-            'startDate' => '2026-01-01', // Past date
-            'endDate' => '2026-01-05',
+            'startDate' => $this->daysFromToday(-30), // Past date
+            'endDate' => $this->daysFromToday(-26),
         ];
 
         $caller = [
@@ -230,8 +248,8 @@ class ApplyLeaveRuntimeIntegrationTest extends TestCase
         $request = [
             'employeeId' => 'EMP-2026-004',
             'leaveType' => 'Sick',
-            'startDate' => '2026-11-01',
-            'endDate' => '2026-11-02',
+            'startDate' => $this->daysFromToday(40),
+            'endDate' => $this->daysFromToday(41),
         ];
 
         $caller = [
@@ -267,8 +285,8 @@ class ApplyLeaveRuntimeIntegrationTest extends TestCase
         $request1 = [
             'employeeId' => 'EMP-2026-001',
             'leaveType' => 'Annual',
-            'startDate' => '2026-11-10',
-            'endDate' => '2026-11-12',
+            'startDate' => $this->daysFromToday(45),
+            'endDate' => $this->daysFromToday(47),
         ];
 
         $caller1 = ['id' => 'EMP-2026-001', 'role' => 'Employee'];
@@ -283,8 +301,8 @@ class ApplyLeaveRuntimeIntegrationTest extends TestCase
         $request2 = [
             'employeeId' => 'EMP-2026-002',
             'leaveType' => 'Sick',
-            'startDate' => '2026-11-15',
-            'endDate' => '2026-11-16',
+            'startDate' => $this->daysFromToday(50),
+            'endDate' => $this->daysFromToday(51),
         ];
 
         $caller2 = ['id' => 'EMP-2026-002', 'role' => 'Employee'];
@@ -311,8 +329,8 @@ class ApplyLeaveRuntimeIntegrationTest extends TestCase
         $request = [
             'employeeId' => 'EMP-2026-001',
             'leaveType' => 'Sick',
-            'startDate' => '2026-11-20',
-            'endDate' => '2026-11-21',
+            'startDate' => $this->daysFromToday(55),
+            'endDate' => $this->daysFromToday(56),
         ];
 
         // Employee caller
@@ -344,8 +362,8 @@ class ApplyLeaveRuntimeIntegrationTest extends TestCase
         $request = [
             'employeeId' => 'EMP-2026-004',
             'leaveType' => 'Annual',
-            'startDate' => '2026-12-01',
-            'endDate' => '2026-12-03',
+            'startDate' => $this->daysFromToday(60),
+            'endDate' => $this->daysFromToday(62),
         ];
 
         $caller = ['id' => 'EMP-2026-004', 'role' => 'Employee'];

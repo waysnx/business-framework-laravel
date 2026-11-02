@@ -143,7 +143,7 @@ $this->app->singleton(WorkflowEngine::class, function ($app) {
 });
 
 CONFIGURATION:
-- Merge config from: implementations/laravel/config/business-framework.php
+- Merge config from: config/business-framework.php
 - Key name: 'business-framework'
 - Support environment overrides via env() helper
 

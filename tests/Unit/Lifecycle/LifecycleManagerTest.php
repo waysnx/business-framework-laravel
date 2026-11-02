@@ -597,6 +597,135 @@ class LifecycleManagerTest extends TestCase
     }
 
     /**
+     * D12: Test that omitted enabled defaults to true
+     */
+    public function testOmittedEnabledDefaultsToTrue(): void
+    {
+        $called = false;
+
+        $handler = new LifecycleHandler(
+            id: 'default-enabled-handler',
+            callable: function () use (&$called) {
+                $called = true;
+            },
+            supportedEvents: ['beforeCreate'],
+            enabled: true  // Explicit true matches default
+        );
+
+        $this->manager->register($handler);
+
+        $event = new LifecycleEvent('beforeCreate');
+        $context = new LifecycleContext();
+
+        $this->manager->dispatch($event, $context);
+
+        $this->assertTrue($called);
+        $this->assertTrue($this->manager->isEnabled('default-enabled-handler'));
+    }
+
+    /**
+     * D12: Test that non-boolean enabled string is rejected at registration
+     */
+    public function testNonBooleanEnabledStringIsRejected(): void
+    {
+        $this->expectException(LifecycleException::class);
+        $this->expectExceptionMessageMatches("/'enabled' must be a boolean/");
+
+        // Create handler with enabled as string (simulates dynamic/JSON configuration)
+        $handler = new LifecycleHandler(
+            id: 'invalid-handler',
+            callable: fn() => null,
+            supportedEvents: ['beforeCreate'],
+            enabled: 'false'  // Invalid: string instead of boolean
+        );
+
+        // Should throw on registration
+        $this->manager->register($handler);
+    }
+
+    /**
+     * D12: Test that non-boolean enabled integer is rejected at registration
+     */
+    public function testNonBooleanEnabledIntegerIsRejected(): void
+    {
+        $this->expectException(LifecycleException::class);
+        $this->expectExceptionMessageMatches("/'enabled' must be a boolean/");
+
+        $handler = new LifecycleHandler(
+            id: 'invalid-handler',
+            callable: fn() => null,
+            supportedEvents: ['beforeCreate'],
+            enabled: 0  // Invalid: integer instead of boolean (even though falsy)
+        );
+
+        $this->manager->register($handler);
+    }
+
+    /**
+     * D12: Test that non-boolean enabled null is rejected at registration
+     */
+    public function testNonBooleanEnabledNullIsRejected(): void
+    {
+        $this->expectException(LifecycleException::class);
+        $this->expectExceptionMessageMatches("/'enabled' must be a boolean/");
+
+        $handler = new LifecycleHandler(
+            id: 'invalid-handler',
+            callable: fn() => null,
+            supportedEvents: ['beforeCreate'],
+            enabled: null  // Invalid: null instead of boolean
+        );
+
+        $this->manager->register($handler);
+    }
+
+    /**
+     * D12: Test that non-numeric priority is rejected at registration
+     */
+    public function testNonNumericPriorityIsRejected(): void
+    {
+        $this->expectException(LifecycleException::class);
+        $this->expectExceptionMessageMatches("/'priority' must be a number/");
+
+        $handler = new LifecycleHandler(
+            id: 'invalid-priority-handler',
+            callable: fn() => null,
+            supportedEvents: ['beforeCreate'],
+            priority: "10"  // Invalid: string instead of number
+        );
+
+        $this->manager->register($handler);
+    }
+
+    /**
+     * D12: Test that numeric priority (including float) is accepted
+     */
+    public function testNumericPriorityIncludingFloatIsAccepted(): void
+    {
+        // Integer priority
+        $handler1 = new LifecycleHandler(
+            id: 'int-priority-handler',
+            callable: fn() => null,
+            supportedEvents: ['beforeCreate'],
+            priority: 10
+        );
+        
+        $this->manager->register($handler1);
+        $this->assertTrue($this->manager->exists('int-priority-handler'));
+
+        // Float priority (also accepted per D12 "non-number" contract)
+        $handler2 = new LifecycleHandler(
+            id: 'float-priority-handler',
+            callable: fn() => null,
+            supportedEvents: ['beforeCreate'],
+            priority: 10.5
+        );
+        
+        $this->manager->register($handler2);
+        $this->assertTrue($this->manager->exists('float-priority-handler'));
+    }
+
+    /**
      * Test handler with no supported events
      */
     public function testHandlerWithNoSupportedEvents(): void

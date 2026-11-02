@@ -7,6 +7,9 @@ namespace WaysNX\BusinessFramework\Tests\Unit\Runtime;
 use PHPUnit\Framework\TestCase;
 use WaysNX\BusinessFramework\Runtime\BusinessFunctionRuntime;
 use WaysNX\BusinessFramework\Models\BusinessFunction;
+use WaysNX\BusinessFramework\Authorization\AuthorizationDecision;
+use WaysNX\BusinessFramework\Contracts\AuthorizerInterface;
+use WaysNX\BusinessFramework\Types\BusinessFunctionInterface;
 
 /**
  * Runtime Experiment Tests
@@ -85,8 +88,14 @@ class RuntimeExperimentTest extends TestCase
     {
         $bf = $this->createBusinessFunctionThatFailsBusinessRules();
 
-        $this->expectException(\RuntimeException::class);
-        $this->runtime->execute($bf, []);
+        try {
+            $this->runtime->execute($bf, []);
+            $this->fail('Expected business rule failure');
+        } catch (\RuntimeException $e) {
+            // Must be the business-rule failure, not an authorization failure
+            $this->assertNotInstanceOf(\WaysNX\BusinessFramework\Exceptions\AuthorizationException::class, $e);
+            $this->assertStringContainsString('Business rule violated', $e->getMessage());
+        }
 
         $context = $this->runtime->getContext();
         $this->assertSame('failed', $context['status']);
@@ -172,7 +181,7 @@ class RuntimeExperimentTest extends TestCase
      */
     private function createTestBusinessFunction(): BusinessFunction
     {
-        return new class extends BusinessFunction {
+        return $this->withExplicitAllow(new class extends BusinessFunction {
             public function __construct()
             {
                 $this->functionId = 'TEST.MODULE.DOMAIN.FUNCTION';
@@ -207,7 +216,7 @@ class RuntimeExperimentTest extends TestCase
             {
                 return ['result' => 'executed'];
             }
-        };
+        });
     }
 
     /**
@@ -215,7 +224,7 @@ class RuntimeExperimentTest extends TestCase
      */
     private function createBusinessFunctionThatFailsValidation(): BusinessFunction
     {
-        return new class extends BusinessFunction {
+        return $this->withExplicitAllow(new class extends BusinessFunction {
             public function __construct()
             {
                 $this->functionId = 'TEST.MODULE.DOMAIN.FUNCTION';
@@ -255,7 +264,7 @@ class RuntimeExperimentTest extends TestCase
             {
                 return [];
             }
-        };
+        });
     }
 
     /**
@@ -311,7 +320,7 @@ class RuntimeExperimentTest extends TestCase
      */
     private function createBusinessFunctionThatFailsBusinessRules(): BusinessFunction
     {
-        return new class extends BusinessFunction {
+        return $this->withExplicitAllow(new class extends BusinessFunction {
             public function __construct()
             {
                 $this->functionId = 'TEST.MODULE.DOMAIN.FUNCTION';
@@ -351,7 +360,7 @@ class RuntimeExperimentTest extends TestCase
             {
                 return [];
             }
-        };
+        });
     }
 
     /**
@@ -359,7 +368,7 @@ class RuntimeExperimentTest extends TestCase
      */
     private function createBusinessFunctionWithTransformation(): BusinessFunction
     {
-        return new class extends BusinessFunction {
+        return $this->withExplicitAllow(new class extends BusinessFunction {
             public function __construct()
             {
                 $this->functionId = 'TEST.MODULE.DOMAIN.FUNCTION';
@@ -404,6 +413,24 @@ class RuntimeExperimentTest extends TestCase
                     'publicField' => $result['publicField'],
                 ];
             }
-        };
+        });
+    }
+
+    /**
+     * Give a test double an explicit allow decision.
+     *
+     * Authorization fails closed since Phase 0 (LAR-08), so test doubles that
+     * exercise post-authorization phases must obtain an explicit decision.
+     */
+    private function withExplicitAllow(BusinessFunction $bf): BusinessFunction
+    {
+        $bf->setAuthorizer(new class implements AuthorizerInterface {
+            public function authorize(BusinessFunctionInterface $function, array $request, mixed $caller)
+            {
+                return AuthorizationDecision::allow('test double');
+            }
+        });
+
+        return $bf;
     }
 }

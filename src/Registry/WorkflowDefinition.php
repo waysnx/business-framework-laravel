@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace WaysNX\BusinessFramework\Registry;
 
+use WaysNX\BusinessFramework\Exceptions\WorkflowDefinitionException;
+
 /**
  * WorkflowDefinition
  *
@@ -240,6 +242,25 @@ class WorkflowDefinition
         $this->triggerEvent = $triggerEvent;
         $this->entryFunction = $entryFunction;
         $this->exitFunction = $exitFunction;
+
+        // WBF-SPEC-0007 / decision D8: sequences are unique within a workflow
+        // definition. Duplicates are rejected at construction time; the engine
+        // keeps a defensive check for definitions created by other means.
+        $seen = [];
+        foreach ($steps as $step) {
+            if (!$step instanceof WorkflowStep) {
+                continue;
+            }
+            if (isset($seen[$step->sequence])) {
+                throw new WorkflowDefinitionException(
+                    "Workflow '{$id}': duplicate sequence {$step->sequence} "
+                    . "(steps '{$seen[$step->sequence]}' and '{$step->id}')",
+                    WorkflowDefinitionException::REASON_DUPLICATE_SEQUENCE
+                );
+            }
+            $seen[$step->sequence] = $step->id;
+        }
+
         $this->steps = $steps;
         $this->supportedEntityTypes = $supportedEntityTypes;
         $this->priority = $priority;
