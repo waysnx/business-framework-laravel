@@ -709,7 +709,7 @@ class LifecycleManagerTest extends TestCase
             supportedEvents: ['beforeCreate'],
             priority: 10
         );
-        
+
         $this->manager->register($handler1);
         $this->assertTrue($this->manager->exists('int-priority-handler'));
 
@@ -720,7 +720,7 @@ class LifecycleManagerTest extends TestCase
             supportedEvents: ['beforeCreate'],
             priority: 10.5
         );
-        
+
         $this->manager->register($handler2);
         $this->assertTrue($this->manager->exists('float-priority-handler'));
     }
