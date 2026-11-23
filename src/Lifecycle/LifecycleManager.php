@@ -83,17 +83,38 @@ class LifecycleManager
      * Adds a handler to the manager for the events it supports.
      * Handlers are registered by ID and indexed by supported events.
      *
+     * D12 Validation: At registration time, the handler's `enabled` and `priority`
+     * properties are validated:
+     * - `enabled` must be a boolean (true/false), never a non-boolean value.
+     * - `priority` must be a number (int or float), never a string or non-numeric value.
+     * Omitted values use their documented defaults (enabled=true, priority=0).
+     *
      * @param LifecycleHandler $handler The handler to register
      *
      * @return self Returns self for method chaining
      *
      * @throws DuplicateHandlerException If handler ID already registered
+     * @throws LifecycleException If enabled or priority has invalid type
      */
     public function register(LifecycleHandler $handler): self
     {
         if (isset($this->handlers[$handler->id])) {
             throw new DuplicateHandlerException(
                 "Handler with ID '{$handler->id}' is already registered."
+            );
+        }
+
+        // D12: Validate enabled property (must be boolean, not coercible to boolean)
+        if (!is_bool($handler->enabled)) {
+            throw new LifecycleException(
+                "Handler '{$handler->id}': 'enabled' must be a boolean (got " . gettype($handler->enabled) . ")"
+            );
+        }
+
+        // D12: Validate priority property (must be numeric, not string or other type)
+        if (!is_numeric($handler->priority) || is_string($handler->priority) || is_bool($handler->priority)) {
+            throw new LifecycleException(
+                "Handler '{$handler->id}': 'priority' must be a number (got " . gettype($handler->priority) . ")"
             );
         }
 

@@ -21,6 +21,14 @@
         <testsuite name="WaysNX Business Framework Test Suite">
             <directory>tests/Unit</directory>
             <directory>tests/Console</directory>
+            <!-- Moved from waysnx-business-framework/packages/core/tests (ADR-0005 step R3) -->
+            <directory>tests/Core</directory>
+        </testsuite>
+        <!-- WBF cross-runtime conformance adapter. Skipped when the Core
+             fixtures (../waysnx-business-framework/tests/conformance/fixtures
+             or $WBF_CONFORMANCE_FIXTURES) are not available. -->
+        <testsuite name="conformance">
+            <directory>tests/Conformance</directory>
         </testsuite>
     </testsuites>
 </phpunit>

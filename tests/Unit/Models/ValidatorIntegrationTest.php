@@ -11,7 +11,7 @@ use WaysNX\BusinessFramework\Models\BusinessFunction;
  * Validator Integration Tests for Canonical BFD
  *
  * This test suite verifies that the canonical BFD representation
- * can be validated for conformance to WBF-DOC-0005 requirements.
+ * can be validated for conformance to WBF-SPEC-0005 requirements.
  *
  * Tests cover:
  * - Valid BFD accepts all validation
@@ -19,7 +19,7 @@ use WaysNX\BusinessFramework\Models\BusinessFunction;
  * - Validator integrates cleanly with existing framework
  *
  * Requirement: BF-CON-01 through BF-CON-05 (Contract requirements)
- * WBF-DOC-0005 Section 24: Conformance
+ * WBF-SPEC-0005 Section 24: Conformance
  *
  * @package WaysNX\BusinessFramework\Tests\Unit\Models
  */

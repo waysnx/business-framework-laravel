@@ -19,6 +19,10 @@ use WaysNX\BusinessFramework\Registry\WorkflowStep;
 use WaysNX\BusinessFramework\Workflow\WorkflowEngine;
 use WaysNX\BusinessFramework\Workflow\WorkflowContext;
 use WaysNX\BusinessFramework\Lifecycle\LifecycleManager;
+use WaysNX\BusinessFramework\Authorization\AuthorizationDecision;
+use WaysNX\BusinessFramework\Contracts\AuthorizerInterface;
+use WaysNX\BusinessFramework\Models\BusinessFunction;
+use WaysNX\BusinessFramework\Types\BusinessFunctionInterface;
 
 /**
  * CreateDemoCommand
@@ -56,6 +60,90 @@ class CreateDemoCommand extends BaseWbfCommand
      * @var string
      */
     protected $description = 'Create and execute a complete WBF demonstration';
+
+    /**
+     * Identity the demo executes as. The demo authorizer allows only this caller.
+     */
+    public const DEMO_CALLER = 'audit-user';
+
+    /**
+     * Build an executable demo Business Function from a registry definition.
+     *
+     * @param BusinessFunctionDefinition $definition Registry definition
+     * @param string $domain Owning domain (metadata)
+     * @param string $capability Owning capability (metadata)
+     * @param array $response Fixed demo response
+     */
+    private function createDemoFunction(
+        BusinessFunctionDefinition $definition,
+        string $domain,
+        string $capability,
+        array $response
+    ): BusinessFunction {
+        return new class ($definition, $domain, $capability, $response) extends BusinessFunction {
+            private array $demoResponse;
+
+            public function __construct(
+                BusinessFunctionDefinition $definition,
+                string $domain,
+                string $capability,
+                array $response
+            ) {
+                $this->demoResponse = $response;
+                $this->functionId = $definition->id;
+                $this->functionName = $definition->displayName;
+                $this->functionVersion = $definition->version;
+                $this->module = $definition->moduleId;
+                $this->domain = $domain;
+                $this->capability = $capability;
+                $this->lifecycleStatus = 'Draft';
+                $this->description = $definition->description;
+                $this->businessOwner = 'Demo';
+                $this->technicalOwner = 'Demo';
+                $this->tags = ['demo'];
+                $this->classification = 'Core';
+                $this->visibility = 'Internal';
+                $this->dependencies = [];
+                $this->eventsPublished = [];
+                $this->eventsConsumed = [];
+                $this->keywords = [];
+                $this->requestContract = ['fields' => ['auditData' => ['type' => 'object']]];
+                $this->responseContract = ['fields' => array_map(fn() => ['type' => 'boolean'], $response)];
+                $this->errorCategories = [];
+                $this->validationRules = [];
+                $this->authorizationRequirements = ['callers' => [CreateDemoCommand::DEMO_CALLER]];
+                $this->businessRules = [];
+                $this->observabilityRequirements = [];
+                $this->auditRequirements = [];
+                $this->initializeBusinessFunction();
+            }
+
+            protected function executeBusiness(array $request): array
+            {
+                return $this->demoResponse;
+            }
+        };
+    }
+
+    /**
+     * Demo authorizer: explicit allow for the demo caller only, deny otherwise.
+     */
+    private function createDemoAuthorizer(string $allowedCaller): AuthorizerInterface
+    {
+        return new class ($allowedCaller) implements AuthorizerInterface {
+            public function __construct(private string $allowedCaller)
+            {
+            }
+
+            public function authorize(BusinessFunctionInterface $function, array $request, mixed $caller)
+            {
+                return $caller === $this->allowedCaller
+                    ? AuthorizationDecision::allow('demo caller')
+                    : AuthorizationDecision::deny('Only the demo caller may run the demo');
+            }
+        };
+    }
+
 
     /**
      * Execute the console command.
@@ -278,7 +366,8 @@ class CreateDemoCommand extends BaseWbfCommand
             correlationId: $correlationId,
             entity: $testAudit,
             moduleId: 'AUDIT',
-            inputData: ['auditData' => $testAudit]
+            inputData: ['auditData' => $testAudit],
+            metadata: ['caller' => self::DEMO_CALLER]
         );
 
         $output .= "Executing workflow \"{$auditWorkflow->displayName}\"...\n";
@@ -286,8 +375,23 @@ class CreateDemoCommand extends BaseWbfCommand
         $output .= "Correlation ID: {$context->correlationId}\n";
         $output .= "\n";
 
-        // Resolve engine and execute workflow
+        // Resolve engine, register executable Business Functions for each step
+        // (each step runs through BusinessFunctionRuntime), then execute.
         $workflowEngine = $this->resolve(WorkflowEngine::class);
+        $demoAuthorizer = $this->createDemoAuthorizer(self::DEMO_CALLER);
+        foreach (
+            [
+                [$validateAuditFn, 'VALIDATE', 'AUDIT', ['valid' => true]],
+                [$recordFindingFn, 'RECORD', 'FINDING', ['recorded' => true]],
+                [$completeAuditFn, 'COMPLETE', 'AUDIT', ['completed' => true]],
+            ] as [$definition, $domain, $capability, $response]
+        ) {
+            $workflowEngine->registerBusinessFunction(
+                $this->createDemoFunction($definition, $domain, $capability, $response)
+                    ->setAuthorizer($demoAuthorizer)
+            );
+        }
+
         $result = $workflowEngine->execute('audit-review', $context);
 
         $output .= "📊 WORKFLOW EXECUTION RESULT\n";

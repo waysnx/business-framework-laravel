@@ -64,19 +64,21 @@ class LifecycleHandler
 
     /**
      * Handler priority (higher = earlier execution)
+     * Validated at registration to ensure integer type
      *
 
-     * @var int
+     * @var mixed
      */
-    public readonly int $priority;
+    public readonly mixed $priority;
 
     /**
      * Whether handler is enabled
+     * Validated at registration to ensure boolean type
      *
 
-     * @var bool
+     * @var mixed
      */
-    public readonly bool $enabled;
+    public readonly mixed $enabled;
 
     /**
      * Handler metadata
@@ -93,16 +95,16 @@ class LifecycleHandler
      * @param string $id The handler ID
      * @param callable $callable The handler callable
      * @param array<string> $supportedEvents Supported event names
-     * @param int $priority Handler priority
-     * @param bool $enabled Whether handler is enabled
+     * @param mixed $priority Handler priority (will be validated at registration)
+     * @param mixed $enabled Whether handler is enabled (will be validated at registration)
      * @param array $metadata Handler metadata
      */
     public function __construct(
         string $id,
         callable $callable,
         array $supportedEvents = [],
-        int $priority = 0,
-        bool $enabled = true,
+        mixed $priority = 0,
+        mixed $enabled = true,
         array $metadata = []
     ) {
         $this->id = $id;

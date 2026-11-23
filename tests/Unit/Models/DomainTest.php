@@ -18,8 +18,8 @@ use JsonSerializable;
  * - Domain Lifecycle (Section 9)
  * - Domain Ownership (Section 10-11)
  * - Domain Metadata (Section 10)
- * - Domain Module Relationship (Section 4, WBF-DOC-0004 Section 5.2)
- * - Domain Capability Relationship (Section 10, WBF-DOC-0004 Section 5.2)
+ * - Domain Module Relationship (Section 4, WBF-SPEC-0004 Section 5.2)
+ * - Domain Capability Relationship (Section 10, WBF-SPEC-0004 Section 5.2)
  * - Domain Dependencies (Section 10, Section 12)
  * - Framework independence
  * - JSON serialization

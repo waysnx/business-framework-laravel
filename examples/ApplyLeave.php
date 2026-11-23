@@ -19,7 +19,7 @@ use WaysNX\BusinessFramework\Models\BusinessFunction;
  * - How to define identity, metadata, and contracts
  * - How to specify business rules, validation, and authorization
  * - How to declare events and dependencies
- * - Complete conformance to WBF-DOC-0005
+ * - Complete conformance to WBF-SPEC-0005
  *
  * Business Scenario:
  *   An employee submits a leave request for one or more consecutive days.
@@ -344,14 +344,25 @@ class ApplyLeave extends BusinessFunction
      *
      * @param array $request The request data
      * @param mixed $caller The caller/user context
-     * @throws \RuntimeException if authorization fails
+     * Authorization fails closed (ADR-0010): an override must deny explicitly
+     * with AuthorizationException. An empty override would allow everyone, so
+     * this example denies until real policy checks are written. Alternatively,
+     * do not override this method and supply an AuthorizerInterface via
+     * setAuthorizer().
+     *
+     * @param array $request The request data
+     * @param mixed $caller The caller/user context
+     * @throws \WaysNX\BusinessFramework\Exceptions\AuthorizationException if authorization is denied
      * @return void
      */
     protected function checkAuthorization(array $request, mixed $caller = null): void
     {
-        // Implementation-specific authorization
-        // In Laravel: Check user roles, permissions, tenant access, etc.
-        // In Node.js: Check JWT claims, RBAC policies, etc.
+        // Implementation-specific authorization, e.g. Laravel Gate/Policies
+        // (roles, permissions). Replace this denial with the real checks and
+        // throw AuthorizationException for every denial.
+        throw new \WaysNX\BusinessFramework\Exceptions\AuthorizationException(
+            'ApplyLeave example: authorization is not implemented'
+        );
     }
 
     /**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace WaysNX\BusinessFramework\BusinessFunctions;
 
+use WaysNX\BusinessFramework\Exceptions\AuthorizationException;
 use WaysNX\BusinessFramework\Models\BusinessFunction;
 use WaysNX\BusinessFramework\ReferenceData\LeaveReferenceData;
 
@@ -324,7 +325,7 @@ class ApplyLeave extends BusinessFunction
      *
      * @param array $request The request data
      * @param mixed $caller The caller context (e.g., User object with roles)
-     * @throws \RuntimeException if authorization fails
+     * @throws AuthorizationException if authorization is denied (an explicit denial, ADR-0010)
      * @return void
      */
     protected function checkAuthorization(array $request, mixed $caller = null): void
@@ -333,7 +334,7 @@ class ApplyLeave extends BusinessFunction
         // Caller structure: ['id' => 'EMP-xxx', 'role' => 'Employee'|'Manager'|'HR_Admin']
 
         if (!$caller || !isset($caller['id']) || !isset($caller['role'])) {
-            throw new \RuntimeException('Caller context required for authorization');
+            throw new AuthorizationException('Caller context required for authorization');
         }
 
         $callerId = $caller['id'];
@@ -347,18 +348,18 @@ class ApplyLeave extends BusinessFunction
 
         if ($callerRole === 'Employee') {
             if ($callerId !== $targetEmployeeId) {
-                throw new \RuntimeException('Employees can only apply leave for themselves');
+                throw new AuthorizationException('Employees can only apply leave for themselves');
             }
         } elseif ($callerRole === 'Manager') {
             // Check if caller is the manager of target employee
             $targetEmployee = LeaveReferenceData::getEmployee($targetEmployeeId);
             if (!$targetEmployee || $targetEmployee['manager_id'] !== $callerId) {
-                throw new \RuntimeException('Managers can only apply leave for their direct reports');
+                throw new AuthorizationException('Managers can only apply leave for their direct reports');
             }
         } elseif ($callerRole === 'HR_Admin') {
             // HR Admin can do anything - no additional check needed
         } else {
-            throw new \RuntimeException("Unknown role: {$callerRole}");
+            throw new AuthorizationException("Unknown role: {$callerRole}");
         }
     }
 

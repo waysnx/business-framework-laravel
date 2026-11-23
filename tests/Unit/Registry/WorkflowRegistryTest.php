@@ -159,8 +159,8 @@ class WorkflowRegistryTest extends TestCase
      */
     public function testRegisterDuplicateStepIdThrowsException(): void
     {
-        $step1 = new WorkflowStep('step-1', 'function-1');
-        $step2 = new WorkflowStep('step-1', 'function-2');
+        $step1 = new WorkflowStep('step-1', 'function-1', 1);
+        $step2 = new WorkflowStep('step-1', 'function-2', 2);
 
         $workflow = $this->createWorkflow('test', ['steps' => [$step1, $step2]]);
 
@@ -662,8 +662,8 @@ class WorkflowRegistryTest extends TestCase
      */
     public function testWorkflowWithSteps(): void
     {
-        $step1 = new WorkflowStep('step-1', 'create-employee');
-        $step2 = new WorkflowStep('step-2', 'send-welcome');
+        $step1 = new WorkflowStep('step-1', 'create-employee', 1);
+        $step2 = new WorkflowStep('step-2', 'send-welcome', 2);
 
         $workflow = $this->createWorkflow('onboarding', ['steps' => [$step1, $step2]]);
         $this->registry->register($workflow);

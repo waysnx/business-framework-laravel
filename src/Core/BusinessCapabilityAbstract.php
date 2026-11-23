@@ -113,10 +113,10 @@ abstract class BusinessCapabilityAbstract extends BaseModelAbstract
     protected string $description = '';
 
     /**
-     * Parent Domain identifier (WBF-DOC-0008 Section 10, WBF-DOC-0004 Section 5.2)
+     * Parent Domain identifier (WBF-DOC-0008 Section 10, WBF-SPEC-0004 Section 5.2)
      *
      * Identifies the Domain this Capability belongs to.
-     * "A Capability belongs to exactly one Domain" (per WBF-DOC-0004)
+     * "A Capability belongs to exactly one Domain" (per WBF-SPEC-0004)
      *
      * @var string|int
      */
@@ -389,7 +389,7 @@ abstract class BusinessCapabilityAbstract extends BaseModelAbstract
     }
 
     /**
-     * Get the parent Domain identifier (WBF-DOC-0008 Section 10, WBF-DOC-0004 Section 5.2)
+     * Get the parent Domain identifier (WBF-DOC-0008 Section 10, WBF-SPEC-0004 Section 5.2)
      *
      * @return string|int The domain ID
      */
@@ -399,7 +399,7 @@ abstract class BusinessCapabilityAbstract extends BaseModelAbstract
     }
 
     /**
-     * Set the parent Domain identifier (WBF-DOC-0008 Section 10, WBF-DOC-0004 Section 5.2)
+     * Set the parent Domain identifier (WBF-DOC-0008 Section 10, WBF-SPEC-0004 Section 5.2)
      *
      * @param string|int $domainId The domain ID
      * @return void

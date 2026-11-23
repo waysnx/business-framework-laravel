@@ -249,8 +249,8 @@ class ApplyLeaveTest extends TestCase
         $request = [
             'employeeId' => 'EMP-2026-001',
             'leaveType' => 'Annual',
-            'startDate' => '15-09-2026', // Wrong format
-            'endDate' => '2026-09-20',
+            'startDate' => '15-09-2026', // Wrong format (intentionally malformed, not a calendar dependency)
+            'endDate' => $this->futureDate(20),
         ];
 
         $caller = [

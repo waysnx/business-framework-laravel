@@ -18,7 +18,7 @@ use WaysNX\BusinessFramework\Types\EntityInterface as FrameworkIndependentEntity
  * Framework Compliance:
  * - Implements: WaysNX\BusinessFramework\Types\EntityInterface
  * - Used by: Laravel BaseModel implementation
- * - Allows: Future framework implementations to use packages/types directly
+ * - Allows: Future framework implementations to use the framework-independent src/Types interfaces directly
  *
  * @extends FrameworkIndependentEntityInterface
  * @package WaysNX\BusinessFramework\Contracts

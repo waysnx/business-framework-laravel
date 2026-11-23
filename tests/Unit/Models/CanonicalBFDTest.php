@@ -15,7 +15,7 @@ use WaysNX\BusinessFramework\Models\BusinessFunction;
  *
  * The BFD is defined by the getCompleteContractDefinition() method which returns
  * a standardized array structure containing all aspects of a Business Function
- * as defined in WBF-DOC-0005.
+ * as defined in WBF-SPEC-0005.
  *
  * Key properties of the canonical BFD:
  * - Framework-independent: No Laravel/PHP-specific objects
@@ -138,7 +138,7 @@ class CanonicalBFDTest extends TestCase
      * Test 1: BFD has all required top-level sections
      *
      * Requirement: BFD MUST contain identity, metadata, contract, processing, operational
-     * WBF-DOC-0005 Section 6: Canonical Business Function Model
+     * WBF-SPEC-0005 Section 6: Canonical Business Function Model
      */
     public function testBfdContainsAllRequiredSections(): void
     {
@@ -161,7 +161,7 @@ class CanonicalBFDTest extends TestCase
      * Test 2: Identity section contains all required fields
      *
      * Requirements: BF-ID-01 through BF-ID-07
-     * WBF-DOC-0005 Section 8: Function Identity
+     * WBF-SPEC-0005 Section 8: Function Identity
      */
     public function testBfdIdentityIsComplete(): void
     {
@@ -199,7 +199,7 @@ class CanonicalBFDTest extends TestCase
      * Test 3: Metadata section contains all required fields
      *
      * Requirements: BF-META-01 through BF-META-10
-     * WBF-DOC-0005 Section 9: Function Metadata
+     * WBF-SPEC-0005 Section 9: Function Metadata
      */
     public function testBfdMetadataIsComplete(): void
     {
@@ -236,7 +236,7 @@ class CanonicalBFDTest extends TestCase
      * Test 4: Contract section contains request, response, and errors
      *
      * Requirements: BF-CON-01 through BF-CON-05, BF-REQ-01, BF-RESP-01
-     * WBF-DOC-0005 Section 10: Business Contract
+     * WBF-SPEC-0005 Section 10: Business Contract
      */
     public function testBfdContractIsComplete(): void
     {
@@ -271,7 +271,7 @@ class CanonicalBFDTest extends TestCase
      * Test 5: Processing section contains validation, authorization, businessRules
      *
      * Requirements: BF-VAL-01 through BF-VAL-06, BF-SEC-01 through BF-SEC-05, BF-BR-01 through BF-BR-05
-     * WBF-DOC-0005 Section 13-16: Execution Pipeline
+     * WBF-SPEC-0005 Section 13-16: Execution Pipeline
      */
     public function testBfdProcessingIsComplete(): void
     {
@@ -305,7 +305,7 @@ class CanonicalBFDTest extends TestCase
      * Test 6: Operational section contains observability and audit
      *
      * Requirements: BF-OBS-01 through BF-OBS-05, BF-OBS-04
-     * WBF-DOC-0005 Section 20: Observability
+     * WBF-SPEC-0005 Section 20: Observability
      */
     public function testBfdOperationalIsComplete(): void
     {
@@ -336,7 +336,7 @@ class CanonicalBFDTest extends TestCase
      * Test 7: BFD is serializable to JSON
      *
      * Requirement: BFD MUST be machine-readable and exchangeable
-     * WBF-DOC-0005 Section 25: Business Function Definition (BFD)
+     * WBF-SPEC-0005 Section 25: Business Function Definition (BFD)
      */
     public function testBfdIsJsonSerializable(): void
     {
@@ -357,7 +357,7 @@ class CanonicalBFDTest extends TestCase
      * Test 8: BFD contains no Laravel-specific objects
      *
      * Requirement: BFD MUST be framework-independent
-     * WBF-DOC-0005 Section 2: Technology Independence
+     * WBF-SPEC-0005 Section 2: Technology Independence
      */
     public function testBfdContainsNoFrameworkObjects(): void
     {

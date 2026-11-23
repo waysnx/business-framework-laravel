@@ -68,6 +68,25 @@ use WaysNX\BusinessFramework\Registry\ValidationRuleDefinition;
  */
 class ValidationFramework
 {
+    /** Built-in rule type: value must be present and non-empty. */
+    public const RULE_REQUIRED = 'required';
+
+    /** Issue code for rule types the framework cannot evaluate (fail closed). */
+    public const CODE_UNKNOWN_RULE = 'WBF.VALIDATION.UNKNOWN_RULE';
+
+    /** Issue code for structurally invalid rule definitions (fail closed). */
+    public const CODE_INVALID_RULE = 'WBF.VALIDATION.INVALID_RULE';
+
+    /** Default issue code for failed required rules without an errorCode. */
+    public const CODE_REQUIRED = 'WBF.VALIDATION.REQUIRED';
+
+    /**
+     * Framework-detected failure for the rule currently being evaluated.
+     *
+     * @var array{code: string, message: string}|null
+     */
+    private ?array $frameworkFailure = null;
+
     /**
      * The validation registry
      *
@@ -165,12 +184,29 @@ class ValidationFramework
                 $this->beforeRule($validation, $rule, $context);
 
                 try {
+                    $this->frameworkFailure = null;
+
                     // Execute the rule
                     if ($this->evaluateRule($rule, $context)) {
                         // Rule passed - continue
                     } else {
                         // Rule failed - create issue
                         $issue = $this->createIssue($rule, $context);
+                        if ($this->frameworkFailure !== null) {
+                            // Framework-detected failure (unknown/invalid rule): fail closed
+                            // as an error regardless of the rule's declared severity.
+                            $issue = new ValidationIssue(
+                                id: $issue->id,
+                                ruleId: $issue->ruleId,
+                                severity: 'error',
+                                message: $this->frameworkFailure['message'],
+                                target: $issue->target,
+                                errorCode: $this->frameworkFailure['code'],
+                                category: $issue->category,
+                                metadata: $issue->metadata
+                            );
+                            $this->frameworkFailure = null;
+                        }
                         $issues[] = $issue;
 
                         // Stop on error if configured
@@ -246,12 +282,89 @@ class ValidationFramework
      */
     protected function evaluateRule(ValidationRuleDefinition $rule, ValidationContext $context): bool
     {
-        // Rule evaluation is delegated to custom implementations
-        // This is the extension point for rule evaluation
-        // The framework does not contain business logic
+        // Phase 0 (LAR-01): validation FAILS CLOSED.
+        // Only explicitly supported rule types are evaluated by the framework.
+        // Any other rule type (including the default 'custom') fails with
+        // WBF.VALIDATION.UNKNOWN_RULE unless a subclass overrides this method
+        // and evaluates it. Applications extend validation by overriding this
+        // method and delegating unsupported types to parent::evaluateRule().
+        switch ($rule->ruleType) {
+            case self::RULE_REQUIRED:
+                if ($rule->target === '') {
+                    $this->recordFrameworkFailure(
+                        self::CODE_INVALID_RULE,
+                        "Rule '{$rule->id}' of type 'required' has no target field"
+                    );
+                    return false;
+                }
 
-        // Default: assume all rules pass (application must override this method)
-        return true;
+                return !self::isMissingOrEmpty($this->resolveTargetValue($rule->target, $context));
+
+            default:
+                $this->recordFrameworkFailure(
+                    self::CODE_UNKNOWN_RULE,
+                    "Rule '{$rule->id}' has unsupported rule type '{$rule->ruleType}'"
+                );
+                return false;
+        }
+    }
+
+    /**
+     * Required-rule semantics (WBF Phase 0 validation contract):
+     * a value is missing or empty when it is absent, null, a string that is
+     * empty after trimming whitespace, or an empty array.
+     */
+    public static function isMissingOrEmpty(mixed $value): bool
+    {
+        if ($value === null) {
+            return true;
+        }
+        if (is_string($value) && trim($value) === '') {
+            return true;
+        }
+        if (is_array($value) && $value === []) {
+            return true;
+        }
+        if ($value instanceof \Countable && count($value) === 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Resolve a rule target from the validation input.
+     *
+     * Targets use dot notation (e.g. "address.city"). The input is
+     * ValidationContext::$inputData. A target that cannot be resolved
+     * yields null (treated as missing).
+     */
+    protected function resolveTargetValue(string $target, ValidationContext $context): mixed
+    {
+        $current = $context->inputData;
+        foreach (explode('.', $target) as $segment) {
+            if (is_array($current) && array_key_exists($segment, $current)) {
+                $current = $current[$segment];
+                continue;
+            }
+            if (is_object($current) && isset($current->{$segment})) {
+                $current = $current->{$segment};
+                continue;
+            }
+            return null;
+        }
+
+        return $current;
+    }
+
+    /**
+     * Record a framework-generated failure code/message for the rule that is
+     * currently being evaluated, so the resulting issue carries a structured
+     * code instead of the rule's own (business) error code.
+     */
+    private function recordFrameworkFailure(string $code, string $message): void
+    {
+        $this->frameworkFailure = ['code' => $code, 'message' => $message];
     }
 
     /**
@@ -268,13 +381,23 @@ class ValidationFramework
         ValidationRuleDefinition $rule,
         ValidationContext $context
     ): ValidationIssue {
+        $errorCode = $rule->errorCode;
+        if ($errorCode === '' && $rule->ruleType === self::RULE_REQUIRED) {
+            $errorCode = self::CODE_REQUIRED;
+        }
+
+        $message = $rule->message;
+        if ($message === '' && $rule->ruleType === self::RULE_REQUIRED) {
+            $message = "Field '{$rule->target}' is required";
+        }
+
         return new ValidationIssue(
             id: (string) Uuid::uuid4(),
             ruleId: $rule->id,
             severity: $rule->severity,
-            message: $rule->message,
+            message: $message,
             target: $rule->target,
-            errorCode: $rule->errorCode,
+            errorCode: $errorCode,
             category: $rule->ruleType,
             metadata: [
                 'ruleName' => $rule->name,
